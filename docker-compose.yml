@@ -18,7 +18,28 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - midimealy-network
+
+  app:
+    build: .
+    container_name: midimealy-app
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/midimealy
+      NODE_ENV: production
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - midimealy-network
 
 volumes:
   postgres_data:
 
+networks:
+  midimealy-network:
+    driver: bridge
