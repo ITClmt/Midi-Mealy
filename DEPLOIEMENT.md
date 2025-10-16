@@ -12,32 +12,28 @@ Ce guide explique comment déployer Midi-Mealy sur **Dokploy** en quelques étap
 
 ---
 
-## 🗄️ Étape 1 : Créer la base de données PostgreSQL
+## 🗄️ Étape 1 : Créer la base de données Supabase
 
-### **Option A : Via Dokploy UI (recommandé)**
+### **Configuration Supabase (recommandé)**
 
-1. Dans Dokploy, va dans **Databases**
-2. Clique sur **Create Database**
-3. Sélectionne **PostgreSQL 16**
-4. Configure :
-   - **Name** : `midimealy-db`
-   - **Database Name** : `midimealy`
-   - **Username** : `postgres`
-   - **Password** : (génère un mot de passe sécurisé)
-5. Clique sur **Create**
-6. **Note la `DATABASE_URL`** qui sera générée (format : `postgres://user:pass@host:5432/midimealy`)
+1. Va sur [supabase.com](https://supabase.com)
+2. Crée un nouveau projet :
+   - **Name** : `Midi-Mealy`
+   - **Database Password** : (génère un mot de passe sécurisé)
+   - **Region** : Choisis la plus proche de toi
+3. Une fois le projet créé, va dans **SQL Editor**
+4. Exécute le script `supabase-schema.sql` du repo
+5. Note ces informations (dans **Settings** > **API**) :
+   - **Project URL** : `https://your-project-id.supabase.co`
+   - **Anon/Public Key** : Ta clé publique
 
-### **Option B : Base de données externe**
+### **Pourquoi Supabase ?**
 
-Tu peux aussi utiliser :
-- **Neon.tech** (serverless PostgreSQL gratuit)
-- **Supabase** (gratuit avec UI)
-- **Railway** / **Render**
-
-Pour Neon :
-1. Va sur [neon.tech](https://neon.tech)
-2. Crée un projet `midimealy`
-3. Copie la **Connection String** fournie
+✅ **Gratuit** jusqu'à 500 MB de base de données  
+✅ **UI intuitive** pour gérer les données  
+✅ **Row Level Security** déjà configuré  
+✅ **API auto-générée** pour tous les CRUD  
+✅ **Backups automatiques** et monitoring inclus
 
 ---
 
@@ -63,22 +59,19 @@ Pour Neon :
 Ajoute ces variables :
 
 ```env
-# Database
-DATABASE_URL=postgres://USER:PASSWORD@HOST:5432/midimealy
+# Supabase
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
 
 # Node
 NODE_ENV=production
 PORT=3000
 
-# App
+# App (optionnel)
 APP_URL=https://ton-domaine.com
-
-# Geolocation (coordonnées par défaut - Paris La Défense)
-DEFAULT_LAT=48.8922
-DEFAULT_LNG=2.2389
 ```
 
-> **Important** : Remplace `DATABASE_URL` par la vraie connexion de ta BDD PostgreSQL.
+> **Important** : Remplace les valeurs Supabase par celles de ton projet (Settings > API dans Supabase).
 
 #### 4️⃣ **Configuration réseau**
 

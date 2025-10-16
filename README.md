@@ -12,7 +12,7 @@ Application full-stack construite avec TanStack Start, PostgreSQL et React-Leafl
 - ⭐ **Système de notation** 1-5 étoiles + commentaires
 - 📍 **Calcul de distance** depuis votre position
 - 🔍 **Recherche & filtres** (nom, tags, distance, note)
-- 🏪 **Base de données PostgreSQL** avec Drizzle ORM
+- 🏪 **Base de données Supabase** (PostgreSQL + API)
 - 🚀 **SSR** avec TanStack Start
 - 🎨 **UI moderne** avec Shadcn/ui + Tailwind CSS
 
@@ -23,7 +23,7 @@ Application full-stack construite avec TanStack Start, PostgreSQL et React-Leafl
 ### Prérequis
 
 - Node.js 18+
-- PostgreSQL 14+ (ou Docker)
+- Un compte Supabase (gratuit)
 - npm/pnpm
 
 ### Installation
@@ -36,22 +36,22 @@ cd Midi-Mealy
 # 2. Installer les dépendances
 npm install --legacy-peer-deps
 
-# 3. Lancer PostgreSQL avec Docker
-docker-compose up -d
+# 3. Configurer Supabase
+# - Créer un projet sur supabase.com
+# - Exécuter le script supabase-schema.sql dans le SQL Editor
+# - Copier les credentials
 
 # 4. Configurer les variables d'environnement
 cp .env.example .env
-# Éditer .env avec ta DATABASE_URL
+# Éditer .env avec tes credentials Supabase
 
-# 5. Générer et appliquer les migrations
-npm run db:generate
-npm run db:migrate
-
-# 6. Lancer l'application
+# 5. Lancer l'application
 npm run dev
 ```
 
 L'application sera accessible sur **http://localhost:3000** 🎉
+
+> 📖 Pour plus de détails sur la configuration Supabase, consulte [SUPABASE_SETUP.md](./SUPABASE_SETUP.md)
 
 ---
 
@@ -61,53 +61,51 @@ L'application sera accessible sur **http://localhost:3000** 🎉
 npm run dev          # Lance le serveur de développement
 npm run build        # Build l'application pour la production
 npm run start        # Lance l'application en production
-npm run db:generate  # Génère les migrations Drizzle
-npm run db:migrate   # Applique les migrations
-npm run db:push      # Push direct sans migration (dev only)
-npm run db:studio    # Ouvre Drizzle Studio (UI base de données)
 npm run check        # Lint + format avec Biome
+npm run docker:build # Build l'image Docker
+npm run docker:up    # Lance l'application avec Docker
 ```
 
 ---
 
-## 🗄️ Base de données
+## 🗄️ Base de données (Supabase)
 
 ### Schéma
 
-- **users** : Utilisateurs (nom, email)
-- **restaurants** : Restaurants (nom, adresse, lat/lng, cuisine, tags, moyenne)
-- **reviews** : Avis (rating 1-5, commentaire, user, restaurant)
+- **restaurants** : Restaurants (nom, adresse, lat/lng, note moyenne, nombre d'avis)
+- **reviews** : Avis (rating 1-5, commentaire, nom utilisateur, restaurant)
 
-### Migrations
+Le schéma complet est disponible dans `supabase-schema.sql`. Il inclut :
+- Relations avec clés étrangères et CASCADE
+- Index pour optimiser les requêtes géolocalisées
+- Row Level Security (RLS) configuré pour la sécurité
 
-```bash
-# Générer les migrations après modification du schéma
-npm run db:generate
+### Accéder à la base de données
 
-# Appliquer les migrations
-npm run db:migrate
-
-# Voir la BDD avec Drizzle Studio
-npm run db:studio
-```
+- **Supabase Dashboard** : Interface web pour gérer les données et voir les logs
+- **SQL Editor** : Exécuter des requêtes SQL directement
+- **Table Editor** : Interface visuelle pour éditer les données
 
 ---
 
-## 🐳 Déploiement sur Dokploy
+## 🐳 Déploiement
 
 ### Étapes rapides
 
-1. **Créer une base PostgreSQL** dans Dokploy
-2. **Créer une application Docker** depuis GitHub
-3. **Ajouter les variables d'environnement** :
+1. **Créer un projet Supabase** sur supabase.com
+2. **Exécuter le schéma SQL** dans le SQL Editor de Supabase
+3. **Déployer l'application** (Vercel, Netlify, Dokploy, etc.)
+4. **Ajouter les variables d'environnement** :
    ```env
-   DATABASE_URL=postgres://user:pass@host:5432/midimealy
+   VITE_SUPABASE_URL=https://your-project.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-anon-key
    NODE_ENV=production
    PORT=3000
    ```
-4. **Déployer** et les migrations s'appliqueront automatiquement !
 
-📚 **Guide complet** : Voir [DEPLOIEMENT.md](./DEPLOIEMENT.md)
+📚 **Guides complets** : 
+- Configuration Supabase : [SUPABASE_SETUP.md](./SUPABASE_SETUP.md)
+- Déploiement Dokploy : [DEPLOIEMENT.md](./DEPLOIEMENT.md)
 
 ---
 
@@ -115,16 +113,15 @@ npm run db:studio
 
 | Technologie | Usage |
 |-------------|-------|
-| **TanStack Start** | Framework full-stack React |
-| **React 18** | UI Library |
-| **TypeScript** | Langage |
-| **PostgreSQL** | Base de données |
-| **Drizzle ORM** | ORM type-safe |
-| **React-Leaflet** | Carte interactive |
-| **Shadcn/ui** | Composants UI |
-| **Tailwind CSS** | Styling |
-| **Zod** | Validation |
-| **Dokploy** | Déploiement |
+| **TanStack Start** | Framework full-stack React SSR |
+| **React 19** | UI Library |
+| **TypeScript** | Langage type-safe |
+| **Supabase** | Backend as a Service (PostgreSQL + API) |
+| **React-Leaflet** | Carte interactive avec OpenStreetMap |
+| **Shadcn/ui** | Composants UI accessibles |
+| **Tailwind CSS** | Utility-first CSS |
+| **Zod** | Validation de schémas |
+| **Biome** | Linter & formatter |
 
 ---
 

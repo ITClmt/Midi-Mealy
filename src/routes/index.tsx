@@ -7,6 +7,7 @@ import {
 	TrendingUp,
 	Utensils,
 } from "lucide-react";
+import { useId } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +15,6 @@ import {
 	CardContent,
 	CardDescription,
 	CardHeader,
-	CardTitle,
 } from "@/components/ui/card";
 
 export const Route = createFileRoute("/")({
@@ -22,11 +22,14 @@ export const Route = createFileRoute("/")({
 });
 
 function RouteComponent() {
+	const featuresId = useId();
+	const statsId = useId();
+	const roadmapId = useId();
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
+		<main className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
 			{/* Hero Section */}
-			<div className="container mx-auto px-4 py-16">
-				<div className="text-center space-y-6 max-w-4xl mx-auto">
+			<section className="container mx-auto px-4 py-16">
+				<header className="text-center space-y-6 max-w-4xl mx-auto">
 					{/* Logo & Badge */}
 					<div className="flex flex-col items-center gap-4">
 						<div className="relative">
@@ -52,7 +55,10 @@ function RouteComponent() {
 					</div>
 
 					{/* CTA Buttons */}
-					<div className="flex flex-wrap justify-center gap-4 pt-4 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
+					<nav
+						className="flex flex-wrap justify-center gap-4 pt-4 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300"
+						aria-label="Actions principales"
+					>
 						<Button
 							size="lg"
 							className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-lg px-8"
@@ -69,11 +75,17 @@ function RouteComponent() {
 							<Star className="mr-2 h-5 w-5" />
 							Top restaurants
 						</Button>
-					</div>
-				</div>
+					</nav>
+				</header>
 
 				{/* Features Grid */}
-				<div className="grid md:grid-cols-3 gap-6 mt-24 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-500">
+				<section
+					className="grid md:grid-cols-3 gap-6 mt-24 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-500"
+					aria-labelledby={featuresId}
+				>
+					<h2 id={featuresId} className="sr-only">
+						Fonctionnalités principales
+					</h2>
 					<FeatureCard
 						icon={<MapPin className="w-10 h-10" />}
 						title="Carte interactive"
@@ -94,10 +106,16 @@ function RouteComponent() {
 						description="Filtre par distance, note moyenne, type de cuisine et tags personnalisés"
 						gradient="from-purple-500 to-pink-500"
 					/>
-				</div>
+				</section>
 
 				{/* Stats Section */}
-				<div className="grid md:grid-cols-3 gap-6 mt-12">
+				<section
+					className="grid md:grid-cols-3 gap-6 mt-12"
+					aria-labelledby={statsId}
+				>
+					<h2 id={statsId} className="sr-only">
+						Statistiques
+					</h2>
 					<StatCard
 						icon={<TrendingUp className="w-8 h-8 text-green-600" />}
 						value="0"
@@ -116,58 +134,63 @@ function RouteComponent() {
 						label="Temps de marche moyen"
 						trend="Depuis ton bureau"
 					/>
-				</div>
+				</section>
 
 				{/* Roadmap Card */}
-				<Card className="mt-16 max-w-4xl mx-auto shadow-xl border-2 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-700">
-					<CardHeader className="text-center">
-						<CardTitle className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-2">
-							<span>🗺️</span> Roadmap
-						</CardTitle>
-						<CardDescription className="text-base">
-							Les fonctionnalités à venir pour rendre Midi-Mealy encore meilleur
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<div className="grid md:grid-cols-2 gap-4">
-							<div className="space-y-3">
-								<h3 className="font-semibold text-lg text-gray-900 flex items-center gap-2">
-									<span className="text-green-600">✓</span> Version 1.0
-								</h3>
-								<RoadmapItem text="Carte interactive Leaflet" done />
-								<RoadmapItem text="Système de notation 1-5" done />
-								<RoadmapItem text="Calcul de distance" done />
-								<RoadmapItem text="Recherche & filtres" done />
-							</div>
-							<div className="space-y-3">
-								<h3 className="font-semibold text-lg text-gray-900 flex items-center gap-2">
-									<span className="text-blue-600">○</span> Version 2.0
-								</h3>
-								<RoadmapItem text="Authentification utilisateurs" />
-								<RoadmapItem text="Upload de photos" />
-								<RoadmapItem text="Tags personnalisés" />
-								<RoadmapItem text="Favoris & listes" />
-							</div>
-						</div>
-					</CardContent>
-				</Card>
+				<section aria-labelledby={roadmapId}>
+					<Card className="mt-16 max-w-4xl mx-auto shadow-xl border-2 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-700">
+						<CardHeader className="text-center">
+							<h2
+								id={roadmapId}
+								className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-2"
+							>
+								<span>🗺️</span> Roadmap
+							</h2>
+							<CardDescription className="text-base">
+								Les fonctionnalités à venir pour rendre Midi-Mealy encore
+								meilleur
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							<article className="grid md:grid-cols-2 gap-4">
+								<div className="space-y-3">
+									<h3 className="font-semibold text-lg text-gray-900 flex items-center gap-2">
+										<span className="text-green-600">✓</span> Version 1.0
+									</h3>
+									<RoadmapItem text="Carte interactive Leaflet" done />
+									<RoadmapItem text="Système de notation 1-5" done />
+									<RoadmapItem text="Calcul de distance" done />
+									<RoadmapItem text="Recherche & filtres" done />
+								</div>
+								<div className="space-y-3">
+									<h3 className="font-semibold text-lg text-gray-900 flex items-center gap-2">
+										<span className="text-blue-600">○</span> Version 2.0
+									</h3>
+									<RoadmapItem text="Authentification utilisateurs" />
+									<RoadmapItem text="Upload de photos" />
+									<RoadmapItem text="Tags personnalisés" />
+									<RoadmapItem text="Favoris & listes" />
+								</div>
+							</article>
+						</CardContent>
+					</Card>
+				</section>
 
 				{/* Tech Stack Footer */}
-				<div className="mt-16 text-center space-y-4">
+				<footer className="mt-16 text-center space-y-4">
 					<p className="text-sm text-gray-500 font-medium">STACK TECHNIQUE</p>
 					<div className="flex flex-wrap justify-center gap-3">
 						<TechBadge text="TanStack Start" />
 						<TechBadge text="React 19" />
 						<TechBadge text="TypeScript" />
-						<TechBadge text="PostgreSQL" />
-						<TechBadge text="Drizzle ORM" />
+						<TechBadge text="Supabase" />
 						<TechBadge text="React-Leaflet" />
 						<TechBadge text="Tailwind CSS" />
 						<TechBadge text="Shadcn/ui" />
 					</div>
-				</div>
-			</div>
-		</div>
+				</footer>
+			</section>
+		</main>
 	);
 }
 
@@ -190,10 +213,13 @@ const FeatureCard = ({
 			<CardHeader>
 				<div
 					className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform duration-300`}
+					aria-hidden="true"
 				>
 					{icon}
 				</div>
-				<CardTitle className="text-2xl">{title}</CardTitle>
+				<h3 className="text-2xl font-semibold leading-none tracking-tight">
+					{title}
+				</h3>
 				<CardDescription className="text-base leading-relaxed">
 					{description}
 				</CardDescription>
@@ -214,10 +240,12 @@ const StatCard = ({ icon, value, label, trend }: StatCardProps) => {
 	return (
 		<Card className="text-center hover:shadow-lg transition-shadow">
 			<CardContent className="pt-6 space-y-2">
-				<div className="flex justify-center">{icon}</div>
-				<div className="text-4xl font-bold text-gray-900">{value}</div>
-				<div className="text-sm font-medium text-gray-700">{label}</div>
-				<div className="text-xs text-gray-500">{trend}</div>
+				<div className="flex justify-center" aria-hidden="true">
+					{icon}
+				</div>
+				<p className="text-4xl font-bold text-gray-900">{value}</p>
+				<p className="text-sm font-medium text-gray-700">{label}</p>
+				<p className="text-xs text-gray-500">{trend}</p>
 			</CardContent>
 		</Card>
 	);

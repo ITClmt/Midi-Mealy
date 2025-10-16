@@ -42,11 +42,6 @@ RUN addgroup --system --gid 1001 nodejs && \
 COPY --from=builder --chown=tanstack:nodejs /app/.output ./.output
 COPY --from=builder --chown=tanstack:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=tanstack:nodejs /app/package.json ./package.json
-COPY --from=builder --chown=tanstack:nodejs /app/src/lib/db ./src/lib/db
-
-# Copy start script
-COPY --chown=tanstack:nodejs start.sh ./start.sh
-RUN chmod +x ./start.sh
 
 # Switch to non-root user
 USER tanstack
@@ -58,5 +53,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
-# Start the application with migrations
-CMD ["./start.sh"]
+# Start the application
+CMD ["node", ".output/server/index.mjs"]
