@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
 	Clock,
 	MapPin,
@@ -27,6 +27,20 @@ function RouteComponent() {
 	const roadmapId = useId();
 	return (
 		<main className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
+			<nav className="flex justify-end gap-4 p-4">
+				<Link
+					to="/auth/signup"
+					className="text-sm text-gray-500 hover:text-gray-700 hover:underline transition-colors duration-300"
+				>
+					Crée un compte
+				</Link>
+				<Link
+					to="/auth/login"
+					className="text-sm text-gray-500 hover:text-gray-700 hover:underline transition-colors duration-300"
+				>
+					Connexion
+				</Link>
+			</nav>
 			{/* Hero Section */}
 			<section className="container mx-auto px-4 py-16">
 				<header className="text-center space-y-6 max-w-4xl mx-auto">
@@ -55,10 +69,7 @@ function RouteComponent() {
 					</div>
 
 					{/* CTA Buttons */}
-					<nav
-						className="flex flex-wrap justify-center gap-4 pt-4 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300"
-						aria-label="Actions principales"
-					>
+					<div className="flex flex-wrap justify-center gap-4 pt-4 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
 						<Button
 							size="lg"
 							className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-lg px-8"
@@ -75,7 +86,7 @@ function RouteComponent() {
 							<Star className="mr-2 h-5 w-5" />
 							Top restaurants
 						</Button>
-					</nav>
+					</div>
 				</header>
 
 				{/* Features Grid */}

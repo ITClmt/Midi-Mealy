@@ -23,6 +23,14 @@ CREATE TABLE IF NOT EXISTS reviews (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS offices (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  address VARCHAR(255),
+  lat DOUBLE PRECISION NOT NULL,
+  lng DOUBLE PRECISION NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
 -- Index pour optimiser les requêtes
 CREATE INDEX IF NOT EXISTS idx_reviews_restaurant_id ON reviews(restaurant_id);
 CREATE INDEX IF NOT EXISTS idx_restaurants_location ON restaurants(lat, lng);
@@ -30,6 +38,7 @@ CREATE INDEX IF NOT EXISTS idx_restaurants_location ON restaurants(lat, lng);
 -- Activer Row Level Security (RLS)
 ALTER TABLE restaurants ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
+ALTER TABLE offices ENABLE ROW LEVEL SECURITY;
 
 -- Politiques RLS pour restaurants (lecture publique)
 CREATE POLICY "Enable read access for all users" 
@@ -67,3 +76,20 @@ CREATE POLICY "Enable delete for authenticated users only"
 ON reviews FOR DELETE 
 USING (auth.role() = 'authenticated');
 
+-- Politiques RLS pour offices (lecture publique)
+CREATE POLICY "Enable read access for all users" 
+ON offices FOR SELECT 
+USING (true);
+
+-- Politiques RLS pour offices (écriture pour utilisateurs authentifiés)
+CREATE POLICY "Enable insert for authenticated users only" 
+ON offices FOR INSERT 
+WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "Enable update for authenticated users only" 
+ON offices FOR UPDATE 
+USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Enable delete for authenticated users only" 
+ON offices FOR DELETE 
+USING (auth.role() = 'authenticated');
