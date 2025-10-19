@@ -22,8 +22,6 @@ export default function SignUpForm() {
 
 	const signUpMutation = useMutation({
 		mutationFn: (data: Parameters<typeof signUp>[0]) => signUp(data),
-		retry: 3,
-		retryDelay: 1000,
 		onSuccess: () => {
 			console.log("signed up successfully");
 

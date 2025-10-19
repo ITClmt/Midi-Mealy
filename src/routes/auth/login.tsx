@@ -1,5 +1,5 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -9,42 +9,37 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { useAppForm } from "@/hooks/form";
-import { getSupabaseServerClient } from "@/lib/db/supabase";
+import { login } from "@/services/auth/auth.api";
+import { LoginSchema } from "@/services/auth/auth.schema";
 
 export const Route = createFileRoute("/auth/login")({
 	component: LoginForm,
 });
 
-const schema = z.object({
-	email: z.string().email("L'email est invalide"),
-	password: z
-		.string()
-		.min(8, "Le mot de passe doit contenir au moins 8 caractères"),
-});
-
 function LoginForm() {
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
+
+	const loginMutation = useMutation({
+		mutationFn: (data: Parameters<typeof login>[0]) => login(data),
+		onSuccess: (response) => {
+			if (response?.error) {
+				console.error(response.message);
+				return;
+			}
+
+			queryClient.resetQueries();
+			navigate({ to: "/" });
+		},
+	});
+
 	const form = useAppForm({
 		defaultValues: {
-			email: "",
-			password: "",
-		},
-		validators: {
-			onBlur: schema,
-		},
-		onSubmit: ({ value }) => {
-			getSupabaseServerClient()
-				.auth.signInWithPassword({
-					email: value.email,
-					password: value.password,
-				})
-				.then(({ error }) => {
-					if (error) {
-						console.error(error);
-					} else {
-						navigate({ to: "/" });
-					}
-				});
+			email: import.meta.env.VITE_DEFAULT_USER_EMAIL ?? "",
+			password: import.meta.env.VITE_DEFAULT_USER_PASSWORD ?? "",
+		} as LoginSchema,
+		onSubmit: async ({ value }) => {
+			await loginMutation.mutateAsync({ data: value });
 		},
 	});
 

@@ -24,9 +24,10 @@ export const SignUpSchema = z
 		message: "Les mots de passe ne correspondent pas",
 	});
 
-export const signInSchema = z.object({
+export const LoginSchema = z.object({
 	email: z.string().email(),
 	password: z.string().min(8),
 });
 
 export type SignUpSchema = z.infer<typeof SignUpSchema>;
+export type LoginSchema = z.infer<typeof LoginSchema>;

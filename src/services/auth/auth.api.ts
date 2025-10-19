@@ -1,7 +1,7 @@
 import { redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getSupabaseServerClient } from "@/lib/db/supabase";
-import { SignUpSchema } from "./auth.schema";
+import { LoginSchema, SignUpSchema } from "./auth.schema";
 
 export const signUp = createServerFn()
 	.inputValidator(SignUpSchema)
@@ -22,4 +22,20 @@ export const signUp = createServerFn()
 		throw redirect({
 			href: "/",
 		});
+	});
+
+export const login = createServerFn()
+	.inputValidator(LoginSchema)
+	.handler(async ({ data }) => {
+		const { error } = await getSupabaseServerClient().auth.signInWithPassword({
+			email: data.email,
+			password: data.password,
+		});
+
+		if (error) {
+			return {
+				error: true,
+				message: error.message,
+			};
+		}
 	});
