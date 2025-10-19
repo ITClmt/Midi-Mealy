@@ -33,7 +33,7 @@ function LoginForm() {
 			onBlur: schema,
 		},
 		onSubmit: ({ value }) => {
-			supabase.auth.signInWithPassword(value).then(({ error, data }) => {
+			supabase.auth.signInWithPassword(value).then(({ error }) => {
 				if (error) {
 					console.error(error);
 				} else {
