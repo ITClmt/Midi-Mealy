@@ -1,5 +1,5 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { z } from "zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -9,70 +9,38 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { useAppForm } from "@/hooks/form";
-import { supabase } from "@/lib/db/supabase";
+import { signUp } from "@/services/auth/auth.api";
+import type { SignUpSchema } from "@/services/auth/auth.schema";
 
 export const Route = createFileRoute("/auth/signup")({
-	component: SignupForm,
+	component: SignUpForm,
 });
 
-const schema = z
-	.object({
-		fullName: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
-		email: z.string().email("L'email est invalide"),
-		password: z
-			.string()
-			.min(8, "Le mot de passe doit contenir au moins 8 caractères")
-			.regex(
-				/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-				"Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre",
-			),
-		confirmPassword: z
-			.string()
-			.min(8, "Le mot de passe doit contenir au moins 8 caractères"),
-	})
-	.refine((data) => data.password === data.confirmPassword, {
-		path: ["confirmPassword"],
-		message: "Les mots de passe ne correspondent pas",
+export default function SignUpForm() {
+	const queryClient = useQueryClient();
+	const router = useRouter();
+
+	const signUpMutation = useMutation({
+		mutationFn: (data: Parameters<typeof signUp>[0]) => signUp(data),
+		retry: 3,
+		retryDelay: 1000,
+		onSuccess: () => {
+			console.log("signed up successfully");
+
+			queryClient.resetQueries();
+			router.invalidate();
+		},
 	});
 
-function SignupForm() {
-	const navigate = useNavigate();
 	const form = useAppForm({
 		defaultValues: {
 			fullName: "",
 			email: "",
 			password: "",
 			confirmPassword: "",
-		},
-		validators: {
-			onBlur: schema,
-		},
+		} as SignUpSchema,
 		onSubmit: async ({ value }) => {
-			try {
-				const { data, error } = await supabase.auth.signUp({
-					email: value.email,
-					password: value.password,
-					options: {
-						data: {
-							full_name: value.fullName,
-						},
-					},
-				});
-
-				if (error) {
-					console.error("Erreur lors de l'inscription:", error.message);
-					alert(`Erreur: ${error.message}`);
-				} else {
-					console.log("Inscription réussie:", data);
-					alert(
-						"Inscription réussie ! Vérifiez votre email pour confirmer votre compte.",
-					);
-					navigate({ to: "/auth/login" });
-				}
-			} catch (error) {
-				console.error("Erreur inattendue:", error);
-				alert("Une erreur inattendue s'est produite.");
-			}
+			await signUpMutation.mutateAsync({ data: value });
 		},
 	});
 

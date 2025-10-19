@@ -9,7 +9,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { useAppForm } from "@/hooks/form";
-import { supabase } from "@/lib/db/supabase";
+import { getSupabaseServerClient } from "@/lib/db/supabase";
 
 export const Route = createFileRoute("/auth/login")({
 	component: LoginForm,
@@ -33,13 +33,18 @@ function LoginForm() {
 			onBlur: schema,
 		},
 		onSubmit: ({ value }) => {
-			supabase.auth.signInWithPassword(value).then(({ error }) => {
-				if (error) {
-					console.error(error);
-				} else {
-					navigate({ to: "/" });
-				}
-			});
+			getSupabaseServerClient()
+				.auth.signInWithPassword({
+					email: value.email,
+					password: value.password,
+				})
+				.then(({ error }) => {
+					if (error) {
+						console.error(error);
+					} else {
+						navigate({ to: "/" });
+					}
+				});
 		},
 	});
 
