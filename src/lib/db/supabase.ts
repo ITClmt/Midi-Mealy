@@ -1,18 +1,14 @@
 import { createServerClient } from "@supabase/ssr";
 import { getCookies, setCookie } from "@tanstack/react-start/server";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl) {
-	throw new Error("VITE_SUPABASE_URL environment variable is required");
-}
-
-if (!supabaseAnonKey) {
-	throw new Error("VITE_SUPABASE_ANON_KEY environment variable is required");
-}
-
 export function getSupabaseServerClient() {
+	const supabaseUrl = process.env.SUPABASE_URL;
+	const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+
+	if (!supabaseUrl || !supabaseAnonKey) {
+		throw new Error("Missing Supabase environment variables");
+	}
+
 	return createServerClient(supabaseUrl, supabaseAnonKey, {
 		cookies: {
 			getAll() {
