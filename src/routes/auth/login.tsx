@@ -1,5 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	Link,
+	redirect,
+	useNavigate,
+} from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -10,10 +15,16 @@ import {
 } from "@/components/ui/card";
 import { useAppForm } from "@/hooks/form";
 import { login } from "@/services/auth/auth.api";
-import { LoginSchema } from "@/services/auth/auth.schema";
+import type { LoginSchema } from "@/services/auth/auth.schema";
 
 export const Route = createFileRoute("/auth/login")({
 	component: LoginForm,
+	beforeLoad: async ({ context }) => {
+		const { authState } = context;
+		if (authState.isAuthenticated) {
+			throw redirect({ to: "/" });
+		}
+	},
 });
 
 function LoginForm() {

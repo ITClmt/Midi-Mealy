@@ -27,20 +27,6 @@ function RouteComponent() {
 	const roadmapId = useId();
 	return (
 		<main className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
-			<nav className="flex justify-end gap-4 p-4">
-				<Link
-					to="/auth/signup"
-					className="text-sm text-gray-500 hover:text-gray-700 hover:underline transition-colors duration-300"
-				>
-					Crée un compte
-				</Link>
-				<Link
-					to="/auth/login"
-					className="text-sm text-gray-500 hover:text-gray-700 hover:underline transition-colors duration-300"
-				>
-					Connexion
-				</Link>
-			</nav>
 			{/* Hero Section */}
 			<section className="container mx-auto px-4 py-16">
 				<header className="text-center space-y-6 max-w-4xl mx-auto">

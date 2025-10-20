@@ -2,8 +2,10 @@ import type { QueryClient } from "@tanstack/react-query";
 import {
 	createRootRouteWithContext,
 	HeadContent,
+	Link,
 	Scripts,
 } from "@tanstack/react-router";
+import { getUser, signOut } from "@/services/auth/auth.api";
 import appCss from "../styles.css?url";
 
 interface MyRouterContext {
@@ -11,6 +13,23 @@ interface MyRouterContext {
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+	beforeLoad: async () => {
+		const user = await getUser();
+		if (user.isAuthenticated) {
+			return {
+				authState: {
+					isAuthenticated: true,
+					user: user.user,
+				},
+			};
+		}
+		return {
+			authState: {
+				isAuthenticated: false,
+				user: null,
+			},
+		};
+	},
 	head: () => ({
 		meta: [
 			// Encodage et titre
@@ -125,12 +144,42 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+	const { authState } = Route.useRouteContext();
+
 	return (
 		<html lang="fr">
 			<head>
 				<HeadContent />
 			</head>
 			<body>
+				{authState.isAuthenticated ? (
+					<nav className="absolute top-4 right-4 flex gap-4">
+						<Link
+							to="/"
+							className="text-sm text-gray-500 hover:text-gray-700 hover:underline transition-colors duration-300"
+							onClick={() => {
+								signOut();
+							}}
+						>
+							Se déconnecter ({authState.user?.meta.username})
+						</Link>
+					</nav>
+				) : (
+					<nav className="absolute top-4 right-4 flex gap-4">
+						<Link
+							to="/auth/signup"
+							className="text-sm text-gray-500 hover:text-gray-700 hover:underline transition-colors duration-300"
+						>
+							Crée un compte
+						</Link>
+						<Link
+							to="/auth/login"
+							className="text-sm text-gray-500 hover:text-gray-700 hover:underline transition-colors duration-300"
+						>
+							Connexion
+						</Link>
+					</nav>
+				)}
 				{children}
 				<Scripts />
 			</body>

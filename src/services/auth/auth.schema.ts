@@ -29,5 +29,21 @@ export const LoginSchema = z.object({
 	password: z.string().min(8),
 });
 
+export const UserMetaSchema = z.object({
+	username: z.string().min(3).max(20),
+});
+
+export type UserMeta = z.infer<typeof UserMetaSchema>;
+
+export type AuthState =
+	| {
+			isAuthenticated: false;
+	  }
+	| {
+			isAuthenticated: true;
+			user: User;
+	  };
+
+export type User = { email?: string; meta: UserMeta };
 export type SignUpSchema = z.infer<typeof SignUpSchema>;
 export type LoginSchema = z.infer<typeof LoginSchema>;
