@@ -14,15 +14,20 @@ interface MyRouterContext {
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
 	beforeLoad: async () => {
-		const user = await getUser();
-		if (user.isAuthenticated) {
-			return {
-				authState: {
-					isAuthenticated: true,
-					user: user.user,
-				},
-			};
+		try {
+			const user = await getUser();
+			if (user?.isAuthenticated) {
+				return {
+					authState: {
+						isAuthenticated: true,
+						user: user.user,
+					},
+				};
+			}
+		} catch (error) {
+			console.error("Error getting user:", error);
 		}
+
 		return {
 			authState: {
 				isAuthenticated: false,
@@ -152,8 +157,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<HeadContent />
 			</head>
 			<body>
-				{authState.isAuthenticated ? (
+				{authState?.isAuthenticated ? (
 					<nav className="absolute top-4 right-4 flex gap-4">
+						<Link
+							to="/"
+							className="text-sm text-gray-500 hover:text-gray-700 hover:underline transition-colors duration-300"
+						>
+							Accueil
+						</Link>
 						<Link
 							to="/"
 							className="text-sm text-gray-500 hover:text-gray-700 hover:underline transition-colors duration-300"
@@ -161,11 +172,17 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 								signOut();
 							}}
 						>
-							Se déconnecter ({authState.user?.meta.username})
+							Se déconnecter
 						</Link>
 					</nav>
 				) : (
 					<nav className="absolute top-4 right-4 flex gap-4">
+						<Link
+							to="/"
+							className="text-sm text-gray-500 hover:text-gray-700 hover:underline transition-colors duration-300"
+						>
+							Accueil
+						</Link>
 						<Link
 							to="/auth/signup"
 							className="text-sm text-gray-500 hover:text-gray-700 hover:underline transition-colors duration-300"

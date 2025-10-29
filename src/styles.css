@@ -2,6 +2,23 @@
 
 @import "tw-animate-css";
 
+/* Leaflet CSS */
+@import "leaflet/dist/leaflet.css";
+
+/* Custom Office Marker Styles */
+.custom-office-marker {
+	background: transparent !important;
+	border: none !important;
+}
+
+.custom-office-marker img {
+	transition: transform 0.2s ease;
+}
+
+.custom-office-marker:hover img {
+	transform: scale(1.1);
+}
+
 @custom-variant dark (&:is(.dark *));
 
 body {

@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OfficesIndexRouteImport } from './routes/offices/index'
+import { Route as OfficesOfficeIdRouteImport } from './routes/offices/$officeId'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
@@ -27,6 +29,16 @@ import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ss
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OfficesIndexRoute = OfficesIndexRouteImport.update({
+  id: '/offices/',
+  path: '/offices/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OfficesOfficeIdRoute = OfficesOfficeIdRouteImport.update({
+  id: '/offices/$officeId',
+  path: '/offices/$officeId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
@@ -100,6 +112,8 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/offices/$officeId': typeof OfficesOfficeIdRoute
+  '/offices': typeof OfficesIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/form/address': typeof DemoFormAddressRoute
@@ -116,6 +130,8 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/offices/$officeId': typeof OfficesOfficeIdRoute
+  '/offices': typeof OfficesIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/form/address': typeof DemoFormAddressRoute
@@ -133,6 +149,8 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/offices/$officeId': typeof OfficesOfficeIdRoute
+  '/offices/': typeof OfficesIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/form/address': typeof DemoFormAddressRoute
@@ -151,6 +169,8 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/demo/tanstack-query'
+    | '/offices/$officeId'
+    | '/offices'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/form/address'
@@ -167,6 +187,8 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/demo/tanstack-query'
+    | '/offices/$officeId'
+    | '/offices'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/form/address'
@@ -183,6 +205,8 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/demo/tanstack-query'
+    | '/offices/$officeId'
+    | '/offices/'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/form/address'
@@ -200,6 +224,8 @@ export interface RootRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  OfficesOfficeIdRoute: typeof OfficesOfficeIdRoute
+  OfficesIndexRoute: typeof OfficesIndexRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
   DemoFormAddressRoute: typeof DemoFormAddressRoute
@@ -219,6 +245,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/offices/': {
+      id: '/offices/'
+      path: '/offices'
+      fullPath: '/offices'
+      preLoaderRoute: typeof OfficesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/offices/$officeId': {
+      id: '/offices/$officeId'
+      path: '/offices/$officeId'
+      fullPath: '/offices/$officeId'
+      preLoaderRoute: typeof OfficesOfficeIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/tanstack-query': {
@@ -320,6 +360,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  OfficesOfficeIdRoute: OfficesOfficeIdRoute,
+  OfficesIndexRoute: OfficesIndexRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,
   DemoFormAddressRoute: DemoFormAddressRoute,
