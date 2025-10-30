@@ -40,12 +40,10 @@ export const RestaurantMap = ({
 		});
 
 		// Ajouter les tuiles
-		L.tileLayer(
-			"https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png",
-			{
-				attribution: "©Stamen Design, ©OpenStreetMap contributors",
-			},
-		).addTo(map);
+		L.tileLayer("https://tile.openstreetmap.bzh/ca/{z}/{x}/{y}.png", {
+			attribution:
+				'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles courtesy of <a href="https://www.openstreetmap.cat" target="_blank">Breton OpenStreetMap Team</a>',
+		}).addTo(map);
 
 		// Créer une icône personnalisée pour l'office
 		const officeIcon = L.divIcon({
@@ -71,12 +69,8 @@ export const RestaurantMap = ({
 			popupAnchor: [0, -48],
 		});
 
-		const restaurantIcon = L.icon({
-			iconUrl: "/leaflet/marker-icon.png",
-			iconSize: [15, 20],
-			iconAnchor: [15, 30],
-			popupAnchor: [0, -30],
-		});
+		// Icône simple avec libellé pour les restaurants
+		// Chaque restaurant aura son propre divIcon afin d'afficher son nom en permanence
 
 		// Ajouter le marqueur de l'office au centre
 		const officeMarker = L.marker(center, {
@@ -90,10 +84,25 @@ export const RestaurantMap = ({
 			</div>
 		`);
 
-		// Ajouter les marqueurs des restaurants
+		// Ajouter les marqueurs des restaurants avec un label visible
 		restaurants.forEach((restaurant) => {
+			const labelIcon = L.divIcon({
+				html: `
+					<div class="flex items-center gap-1 font-mono" role="button" aria-label="${restaurant.name}">
+						<span class="w-2 h-2 rounded-full bg-red-600"></span>
+						<span class="px-1 py-0.5 rounded bg-blue-200/90 text-[11px] leading-none text-gray-900 shadow">
+							${restaurant.name}
+						</span>
+					</div>
+				`,
+				className: "custom-restaurant-label",
+				iconSize: [0, 0],
+				iconAnchor: [0, 0],
+				popupAnchor: [0, -10],
+			});
+
 			const marker = L.marker([restaurant.latitude, restaurant.longitude], {
-				icon: restaurantIcon,
+				icon: labelIcon,
 			}).addTo(map);
 
 			// Créer le contenu de la popup
