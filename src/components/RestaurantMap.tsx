@@ -114,7 +114,14 @@ export const RestaurantMap = ({
 			const popupContent = `
         <div class="p-2 min-w-[180px] max-w-[240px] flex flex-col gap-0.5">
           <h3 class="font-semibold text-sm text-gray-900 leading-tight mb-0.5 truncate">${restaurant.name}</h3>
-          <p class="text-gray-600 text-xs truncate">${restaurant.address}</p>
+          <a 
+            href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.address || restaurant.name)}"
+            target="_blank" 
+            rel="noopener noreferrer" 
+            class="text-blue-600 underline text-xs truncate block hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Voir sur Google Maps"
+            tabindex="0"
+            >${restaurant.address}</a>
           <div class="flex items-center gap-2 mt-0.5">
             ${restaurant.cuisine ? `<span class="text-blue-600 text-[10px] leading-none">🍽️ ${restaurant.cuisine}</span>` : ""}
             ${restaurant.rating ? `<span class="text-yellow-600 text-[10px] leading-none">⭐ ${restaurant.rating}/5</span>` : ""}

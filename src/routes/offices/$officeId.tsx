@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Badge, MapPin, Search, Users, Utensils, X } from "lucide-react";
+import { MapPin, Search, Users, X } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { RestaurantMapContainer } from "@/components/RestaurantMapContainer";
 import { Input } from "@/components/ui/input";
@@ -262,7 +262,7 @@ function RestaurantComponent() {
 								center={[office.lat, office.lng]}
 								officeLogoUrl={office.logo_url}
 								zoom={17}
-								className="w-full h-[490px] rounded-lg"
+								className="w-full h-[495px] rounded-lg"
 								restaurants={mappedRestaurants}
 								selectedRestaurantId={selectedRestaurantId}
 								onRestaurantClick={(restaurant) => {
