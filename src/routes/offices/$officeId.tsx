@@ -262,7 +262,7 @@ function RestaurantComponent() {
 								center={[office.lat, office.lng]}
 								officeLogoUrl={office.logo_url}
 								zoom={17}
-								className="w-full h-100 rounded-lg"
+								className="w-full h-[490px] rounded-lg"
 								restaurants={mappedRestaurants}
 								selectedRestaurantId={selectedRestaurantId}
 								onRestaurantClick={(restaurant) => {

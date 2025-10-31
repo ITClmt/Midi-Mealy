@@ -91,9 +91,9 @@ export const RestaurantMap = ({
 		restaurants.forEach((restaurant) => {
 			const labelIcon = L.divIcon({
 				html: `
-					<div class="flex items-center gap-1 font-mono" role="button" aria-label="${restaurant.name}">
-						<span class="w-2 h-2 rounded-full bg-red-600"></span>
-						<span class="px-1 py-0.5 rounded bg-blue-200/90 text-[11px] leading-none text-gray-900 shadow">
+					<div class="flex items-center gap-2 font-sans group px-0.5 py-0.5 rounded-lg shadow-lg bg-white border-2 border-blue-200 hover:border-blue-400 transition-all" role="button" aria-label="${restaurant.name}">
+						<span class="w-3 h-3 rounded-full bg-gradient-to-br from-red-500 via-orange-400 to-red-600 border-2 border-white shadow-md"></span>
+						<span class="px-2 py-1 rounded-md bg-blue-50 text-xs leading-tight font-semibold text-blue-900 shadow-sm whitespace-nowrap group-hover:bg-blue-100 transition-colors">
 							${restaurant.name}
 						</span>
 					</div>
