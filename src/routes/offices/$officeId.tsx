@@ -123,19 +123,12 @@ function RestaurantComponent() {
 			{/* Hero Section */}
 			<section className="container mx-auto px-4">
 				<div className="text-center space-y-6 max-w-4xl mx-auto">
-					{/* Icon & Badge */}
-					<div className="flex flex-col items-center gap-4">
-						<Badge className="text-sm px-4 py-1">
-							🍽️ Restaurants {office.name}
-						</Badge>
-					</div>
-
 					{/* Title & Description */}
-					<div className="space-y-4">
-						<h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-red-600 via-orange-600 to-red-600 bg-clip-text text-transparent animate-in fade-in slide-in-from-bottom-4 duration-1000">
+					<div className="space-y-4 pt-12">
+						<h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-red-600 via-orange-600 to-red-600 bg-clip-text text-transparent">
 							Restaurants {office.name}
 						</h1>
-						<p className="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-5 duration-1000 delay-150">
+						<p className="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto">
 							Découvrez les meilleurs restaurants à proximité de {office.name}
 						</p>
 					</div>
@@ -143,7 +136,7 @@ function RestaurantComponent() {
 
 				{/* Restaurants Stats */}
 				{restaurants && restaurants.length > 0 && (
-					<section className="mt-8 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-200">
+					<section className="mt-8">
 						<div className="text-center mb-8">
 							<div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
 								<Users className="w-4 h-4" />
@@ -156,7 +149,7 @@ function RestaurantComponent() {
 
 				{/* Map Section */}
 				{restaurants && restaurants.length > 0 && (
-					<section className="mt-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-400">
+					<section className="mt-8">
 						<div className="relative w-full mb-4" ref={autocompleteRef}>
 							<div className="relative flex gap-2 w-full">
 								<div className="relative flex-1">
