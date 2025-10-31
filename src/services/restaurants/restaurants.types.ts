@@ -15,6 +15,7 @@ export interface RestaurantMapProps {
 	className?: string;
 	restaurants?: Restaurant[];
 	onRestaurantClick?: (restaurant: Restaurant) => void;
+	selectedRestaurantId?: string;
 }
 
 export interface RestaurantMapContainerProps {
@@ -24,4 +25,5 @@ export interface RestaurantMapContainerProps {
 	className?: string;
 	restaurants?: Restaurant[];
 	onRestaurantClick?: (restaurant: Restaurant) => void;
+	selectedRestaurantId?: string;
 }

@@ -11,9 +11,11 @@ export const RestaurantMap = ({
 	className = "w-full h-96",
 	restaurants = [],
 	onRestaurantClick,
+	selectedRestaurantId,
 }: RestaurantMapProps) => {
 	const mapRef = useRef<L.Map | null>(null);
 	const mapContainerRef = useRef<HTMLDivElement>(null);
+	const markersRef = useRef<Map<string, L.Marker>>(new Map());
 
 	useEffect(() => {
 		// Vérifier que nous sommes côté client
@@ -85,6 +87,7 @@ export const RestaurantMap = ({
 		`);
 
 		// Ajouter les marqueurs des restaurants avec un label visible
+		markersRef.current.clear();
 		restaurants.forEach((restaurant) => {
 			const labelIcon = L.divIcon({
 				html: `
@@ -105,19 +108,17 @@ export const RestaurantMap = ({
 				icon: labelIcon,
 			}).addTo(map);
 
+			markersRef.current.set(restaurant.id, marker);
+
 			// Créer le contenu de la popup
 			const popupContent = `
-        <div class="p-3 min-w-[200px]">
-          <h3 class="font-bold text-lg text-gray-900 mb-2">${restaurant.name}</h3>
-          <p class="text-gray-600 text-sm mb-2">${restaurant.address}</p>
-          ${restaurant.cuisine ? `<p class="text-blue-600 text-sm mb-2">🍽️ ${restaurant.cuisine}</p>` : ""}
-          ${restaurant.rating ? `<p class="text-yellow-600 text-sm">⭐ ${restaurant.rating}/5</p>` : ""}
-          <button 
-            class="mt-2 bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors"
-            onclick="window.restaurantClickHandler && window.restaurantClickHandler('${restaurant.id}')"
-          >
-            Voir détails
-          </button>
+        <div class="p-2 min-w-[180px] max-w-[240px] flex flex-col gap-0.5">
+          <h3 class="font-semibold text-sm text-gray-900 leading-tight mb-0.5 truncate">${restaurant.name}</h3>
+          <p class="text-gray-600 text-xs truncate">${restaurant.address}</p>
+          <div class="flex items-center gap-2 mt-0.5">
+            ${restaurant.cuisine ? `<span class="text-blue-600 text-[10px] leading-none">🍽️ ${restaurant.cuisine}</span>` : ""}
+            ${restaurant.rating ? `<span class="text-yellow-600 text-[10px] leading-none">⭐ ${restaurant.rating}/5</span>` : ""}
+          </div>
         </div>
       `;
 
@@ -153,6 +154,7 @@ export const RestaurantMap = ({
 				mapRef.current.remove();
 				mapRef.current = null;
 			}
+			markersRef.current.clear();
 			// Nettoyer le gestionnaire global
 			if (
 				(
@@ -169,6 +171,29 @@ export const RestaurantMap = ({
 			}
 		};
 	}, [center, zoom, restaurants, onRestaurantClick, officeLogoUrl]);
+
+	// Effet pour centrer la carte sur le restaurant sélectionné
+	useEffect(() => {
+		if (!selectedRestaurantId || !mapRef.current) {
+			return;
+		}
+
+		const restaurant = restaurants.find((r) => r.id === selectedRestaurantId);
+		if (!restaurant) {
+			return;
+		}
+
+		const marker = markersRef.current.get(selectedRestaurantId);
+		if (marker) {
+			// Centrer la carte sur le restaurant avec animation
+			mapRef.current.setView([restaurant.latitude, restaurant.longitude], 18, {
+				animate: true,
+				duration: 0.5,
+			});
+			// Ouvrir la popup du restaurant
+			marker.openPopup();
+		}
+	}, [selectedRestaurantId, restaurants]);
 
 	return <div ref={mapContainerRef} className={className} />;
 };

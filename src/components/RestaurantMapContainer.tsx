@@ -8,7 +8,10 @@ const RestaurantMapComponent = lazy(() =>
 	import("./RestaurantMap").then((mod) => ({ default: mod.RestaurantMap })),
 );
 
-export const RestaurantMapContainer = (props: RestaurantMapContainerProps) => {
+export const RestaurantMapContainer = ({
+	selectedRestaurantId,
+	...props
+}: RestaurantMapContainerProps) => {
 	return (
 		<Suspense
 			fallback={
@@ -19,7 +22,10 @@ export const RestaurantMapContainer = (props: RestaurantMapContainerProps) => {
 				</div>
 			}
 		>
-			<RestaurantMapComponent {...props} />
+			<RestaurantMapComponent
+				selectedRestaurantId={selectedRestaurantId}
+				{...props}
+			/>
 		</Suspense>
 	);
 };
