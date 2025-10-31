@@ -134,20 +134,21 @@ CREATE POLICY "Enable delete for authenticated users only"
 ON offices FOR DELETE
 USING (auth.role() = 'authenticated');
 
--- Politiques RLS pour osm_restaurants_cache (lecture publique)
+-- Politiques RLS pour osm_restaurants_cache (accès public pour cache)
+-- Permet les opérations serveur sans authentification
 CREATE POLICY "Enable read access for all users"
 ON osm_restaurants_cache FOR SELECT
 USING (true);
 
--- Politiques RLS pour osm_restaurants_cache (écriture pour utilisateurs authentifiés)
-CREATE POLICY "Enable insert for authenticated users only"
+CREATE POLICY "Enable insert for all users"
 ON osm_restaurants_cache FOR INSERT
-WITH CHECK (auth.role() = 'authenticated');
+WITH CHECK (true);
 
-CREATE POLICY "Enable update for authenticated users only"
+CREATE POLICY "Enable update for all users"
 ON osm_restaurants_cache FOR UPDATE
-USING (auth.role() = 'authenticated');
+USING (true)
+WITH CHECK (true);
 
-CREATE POLICY "Enable delete for authenticated users only"
+CREATE POLICY "Enable delete for all users"
 ON osm_restaurants_cache FOR DELETE
-USING (auth.role() = 'authenticated');
+USING (true);

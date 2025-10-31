@@ -111,23 +111,28 @@ export const RestaurantMap = ({
 			markersRef.current.set(restaurant.id, marker);
 
 			// Créer le contenu de la popup
+			const googleMapsQuery = restaurant.address
+				? `${restaurant.name}, ${restaurant.address}`
+				: `${restaurant.latitude},${restaurant.longitude}`;
+
 			const popupContent = `
-        <div class="p-2 min-w-[180px] max-w-[240px] flex flex-col gap-0.5">
-          <h3 class="font-semibold text-sm text-gray-900 leading-tight mb-0.5 truncate">${restaurant.name}</h3>
+        <div class="p-3 min-w-[200px] max-w-[240px] flex flex-col gap-2 bg-white rounded-lg">
           <a 
-            href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.address || restaurant.name)}"
+            href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(googleMapsQuery)}"
             target="_blank" 
             rel="noopener noreferrer" 
-            class="text-blue-600 underline text-xs truncate block hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Voir sur Google Maps"
+            class="flex flex-col gap-1 hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+            aria-label="Voir ${restaurant.name} sur Google Maps"
             tabindex="0"
-            >${restaurant.address}</a>
-          <div class="flex items-center gap-2 mt-0.5">
-            ${restaurant.cuisine ? `<span class="text-blue-600 text-[10px] leading-none">🍽️ ${restaurant.cuisine}</span>` : ""}
-            ${restaurant.rating ? `<span class="text-yellow-600 text-[10px] leading-none">⭐ ${restaurant.rating}/5</span>` : ""}
-          </div>
-        </div>
-      `;
+          >
+            <h3 class="font-semibold text-sm text-blue-900 leading-tight truncate">${restaurant.name}</h3>
+         <span class="text-xs text-gray-600 leading-tight hover:text-blue-900 transition-colors">${restaurant?.address}</span>
+          </a>
+        
+          <div class="flex items-center gap-2 flex-wrap">
+            ${restaurant.cuisine ? `<span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-900 text-xs leading-tight font-medium">🍽️ ${restaurant.cuisine}</span>` : ""}
+            ${restaurant.rating ? `<span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-900 text-xs leading-tight font-medium">⭐ ${restaurant.rating}/5</span>` : ""}
+          </div>`;
 
 			marker.bindPopup(popupContent);
 
