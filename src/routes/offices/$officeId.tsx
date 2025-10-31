@@ -121,16 +121,10 @@ function RestaurantComponent() {
 	return (
 		<main className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
 			{/* Hero Section */}
-			<section className="container mx-auto px-4 py-16">
+			<section className="container mx-auto px-4">
 				<div className="text-center space-y-6 max-w-4xl mx-auto">
 					{/* Icon & Badge */}
 					<div className="flex flex-col items-center gap-4">
-						<div className="relative">
-							<div className="absolute inset-0 bg-red-600 rounded-full blur-2xl opacity-20 animate-pulse" />
-							<div className="relative bg-gradient-to-br from-red-600 to-orange-600 text-white p-6 rounded-3xl shadow-2xl">
-								<Utensils className="w-20 h-20" />
-							</div>
-						</div>
 						<Badge className="text-sm px-4 py-1">
 							🍽️ Restaurants {office.name}
 						</Badge>
@@ -149,7 +143,7 @@ function RestaurantComponent() {
 
 				{/* Restaurants Stats */}
 				{restaurants && restaurants.length > 0 && (
-					<section className="mt-16 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-200">
+					<section className="mt-8 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-200">
 						<div className="text-center mb-8">
 							<div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
 								<Users className="w-4 h-4" />
@@ -162,7 +156,7 @@ function RestaurantComponent() {
 
 				{/* Map Section */}
 				{restaurants && restaurants.length > 0 && (
-					<section className="mt-16 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-400">
+					<section className="mt-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-400">
 						<div className="relative w-full mb-4" ref={autocompleteRef}>
 							<div className="relative flex gap-2 w-full">
 								<div className="relative flex-1">
