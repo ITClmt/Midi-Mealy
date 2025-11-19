@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-router";
 import { getUser, signOut } from "@/services/auth/auth.api";
 import appCss from "../styles.css?url";
+import { Bounce, ToastContainer } from "react-toastify";
 
 interface MyRouterContext {
 	queryClient: QueryClient;
@@ -200,6 +201,19 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				{children}
 				<Scripts />
 			</body>
+			<ToastContainer
+				position="top-right"
+				autoClose={4000}
+				hideProgressBar={false}
+				newestOnTop={false}
+				closeOnClick={false}
+				rtl={false}
+				pauseOnFocusLoss
+				draggable
+				pauseOnHover
+				theme="light"
+				transition={Bounce}
+				/>
 		</html>
 	);
 }
