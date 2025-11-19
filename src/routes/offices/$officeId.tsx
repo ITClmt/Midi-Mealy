@@ -2,7 +2,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { createReview } from "@/services/reviews/reviews.api";
 import { createFileRoute } from "@tanstack/react-router";
 import { MapPin, Search, X } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
+import { useClickOutside } from "@/hooks/useClickOutside";
 import FoundRestauBadge from "@/components/FoundRestauBadge";
 import { RestaurantMapContainer } from "@/components/RestaurantMapContainer";
 import { Input } from "@/components/ui/input";
@@ -71,23 +72,6 @@ function RestaurantComponent() {
 			}),
 	});
 
-	// Fermer les suggestions quand on clique en dehors
-	useEffect(() => {
-		const handleClickOutside = (e: MouseEvent) => {
-			if (
-				autocompleteRef.current &&
-				!autocompleteRef.current.contains(e.target as Node)
-			) {
-				setShowSuggestions(false);
-			}
-		};
-
-		document.addEventListener("click", handleClickOutside);
-		return () => {
-			document.removeEventListener("click", handleClickOutside);
-		};
-	}, []);
-
 	// Filter restaurants for review search
 	const filteredReviewRestaurants =
 		restaurants?.filter(
@@ -96,22 +80,9 @@ function RestaurantComponent() {
 				restaurant.address?.toLowerCase().includes(reviewSearch.toLowerCase()),
 		) || [];
 
-	// Close review suggestions when clicking outside
-	useEffect(() => {
-		const handleClickOutside = (e: MouseEvent) => {
-			if (
-				reviewAutocompleteRef.current &&
-				!reviewAutocompleteRef.current.contains(e.target as Node)
-			) {
-				setShowReviewSuggestions(false);
-			}
-		};
-
-		document.addEventListener("click", handleClickOutside);
-		return () => {
-			document.removeEventListener("click", handleClickOutside);
-		};
-	}, []);
+	// Close suggestions when clicking outside
+	useClickOutside(autocompleteRef, () => setShowSuggestions(false));
+	useClickOutside(reviewAutocompleteRef, () => setShowReviewSuggestions(false));
 
 	if (isPending) {
 		return (
