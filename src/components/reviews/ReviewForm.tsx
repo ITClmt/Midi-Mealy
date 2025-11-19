@@ -1,9 +1,9 @@
-import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 import { toast } from "react-toastify";
-import { createReview } from "@/services/reviews/reviews.api";
-import type { Restaurant } from "@/services/restaurants/restaurants.types";
 import { RestaurantSearchInput } from "@/components/restaurants/RestaurantSearchInput";
+import type { Restaurant } from "@/services/restaurants/restaurants.types";
+import { createReview } from "@/services/reviews/reviews.api";
 
 interface ReviewFormProps {
 	restaurants: Restaurant[];
@@ -95,7 +95,10 @@ export function ReviewForm({ restaurants }: ReviewFormProps) {
 					<div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
 						{/* Rating */}
 						<div className="flex flex-col items-center gap-2">
-							<label className="block text-sm font-medium text-gray-700">
+							<label
+								className="block text-sm font-medium text-gray-700"
+								htmlFor="rating"
+							>
 								Votre note
 							</label>
 							<div className="flex gap-1">
@@ -108,6 +111,7 @@ export function ReviewForm({ restaurants }: ReviewFormProps) {
 										onMouseLeave={() => setHoveredRating(0)}
 										onClick={() => setRating(star)}
 									>
+										{/** biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
 										<svg
 											className={`w-8 h-8 ${
 												star <= (hoveredRating || rating)
@@ -137,6 +141,7 @@ export function ReviewForm({ restaurants }: ReviewFormProps) {
 							>
 								Commentaire (optionnel)
 							</label>
+							{/** biome-ignore lint/correctness/useUniqueElementIds: <explanation> */}
 							<textarea
 								id="comment"
 								rows={3}

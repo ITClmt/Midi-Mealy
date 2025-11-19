@@ -54,3 +54,64 @@ export const fetchReviewsByRestaurantId = createServerFn({ method: "GET" })
 
 		return data as Review[];
 	});
+
+export const fetchTopRestaurants = createServerFn({ method: "POST" })
+	.inputValidator((restaurantIds: string[]) => restaurantIds)
+	.handler(async ({ data: restaurantIds }) => {
+		const supabase = getSupabaseServerClient();
+
+		if (!restaurantIds.length) return [];
+
+		const { data: reviews, error } = await supabase
+			.from("reviews")
+			.select("*")
+			.in("restaurant_id", restaurantIds);
+
+		if (error) {
+			console.error("Error fetching reviews for top list:", error);
+			throw new Error(
+				"Erreur lors de la récupération des meilleurs restaurants",
+			);
+		}
+
+		// Aggregate ratings
+		const restaurantStats = reviews.reduce(
+			(acc, review) => {
+				if (!acc[review.restaurant_id]) {
+					acc[review.restaurant_id] = {
+						id: review.restaurant_id,
+						name: review.restaurant_name,
+						totalRating: 0,
+						count: 0,
+					};
+				}
+				acc[review.restaurant_id].totalRating += review.rating;
+				acc[review.restaurant_id].count += 1;
+				return acc;
+			},
+			{} as Record<
+				string,
+				{ id: string; name: string; totalRating: number; count: number }
+			>,
+		);
+
+		// Calculate average and sort
+		const topRestaurants = (
+			Object.values(restaurantStats) as {
+				id: string;
+				name: string;
+				totalRating: number;
+				count: number;
+			}[]
+		)
+			.map((stat) => ({
+				id: stat.id,
+				name: stat.name,
+				averageRating: stat.totalRating / stat.count,
+				reviewCount: stat.count,
+			}))
+			.sort((a, b) => b.averageRating - a.averageRating)
+			.slice(0, 3);
+
+		return topRestaurants;
+	});

@@ -16,12 +16,14 @@ CREATE TABLE IF NOT EXISTS restaurants (
 
 -- Table des avis/reviews
 CREATE TABLE IF NOT EXISTS reviews (
-  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  restaurant_id BIGINT NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
-  user_name TEXT NOT NULL,
-  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
-  comment TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id uuid not null default gen_random_uuid (),
+  created_at timestamp with time zone not null default now(),
+  restaurant_id text not null, -- OSM ID is string (e.g., "osm_123")
+  restaurant_name text not null,
+  rating integer not null check (rating >= 1 and rating <= 5),
+  comment text null,
+  user_id uuid default auth.uid(), -- Links to the authenticated user
+  constraint reviews_pkey primary key (id)
 );
 
 -- Table des bureaux/offices
@@ -152,3 +154,21 @@ WITH CHECK (true);
 CREATE POLICY "Enable delete for all users"
 ON osm_restaurants_cache FOR DELETE
 USING (true);
+
+-- Enable Row Level Security
+alter table public.reviews enable row level security;
+-- Allow everyone to read reviews
+create policy "Enable read access for all users"
+on public.reviews for select
+using (true);
+-- Allow authenticated users to insert reviews
+create policy "Enable insert for authenticated users only"
+on public.reviews for insert
+with check (auth.role() = 'authenticated');
+-- Optional: Allow users to update/delete their own reviews
+create policy "Enable update for users based on user_id"
+on public.reviews for update
+using (auth.uid() = user_id);
+create policy "Enable delete for users based on user_id"
+on public.reviews for delete
+using (auth.uid() = user_id);

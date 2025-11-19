@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { OfficeHero } from "@/components/offices/OfficeHero";
+import { OfficeMapSection } from "@/components/offices/OfficeMapSection";
+import { ReviewForm } from "@/components/reviews/ReviewForm";
+import ReviewSection from "@/components/reviews/ReviewSection";
 import {
 	fetchOfficeById,
 	fetchOSMRestaurants,
 } from "@/services/offices/offices.api";
-import { OfficeHero } from "@/components/offices/OfficeHero";
-import { ReviewForm } from "@/components/reviews/ReviewForm";
-import { OfficeMapSection } from "@/components/offices/OfficeMapSection";
 import type { Restaurant as OSMRestaurant } from "@/services/offices/offices.types";
 import type { Restaurant } from "@/services/restaurants/restaurants.types";
 
@@ -73,6 +74,8 @@ function RestaurantComponent() {
 			/>
 
 			<ReviewForm restaurants={mappedRestaurants} />
+
+			<ReviewSection office={office} restaurants={mappedRestaurants} />
 
 			{mappedRestaurants.length > 0 && (
 				<OfficeMapSection office={office} restaurants={mappedRestaurants} />
