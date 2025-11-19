@@ -10,6 +10,7 @@ import {
 } from "@/services/offices/offices.api";
 import type { Restaurant as OSMRestaurant } from "@/services/offices/offices.types";
 import type { Restaurant } from "@/services/restaurants/restaurants.types";
+import { fetchRestaurantRatings } from "@/services/reviews/reviews.api";
 
 export const Route = createFileRoute("/offices/$officeId")({
 	component: RestaurantComponent,
@@ -33,6 +34,15 @@ function RestaurantComponent() {
 			fetchOSMRestaurants({
 				data: { lat: office.lat, lng: office.lng },
 			}),
+	});
+
+	const { data: ratings } = useQuery({
+		queryKey: ["restaurant-ratings", office.id],
+		queryFn: () =>
+			fetchRestaurantRatings({
+				data: (osmRestaurants || []).map((r) => r.id),
+			}),
+		enabled: !!osmRestaurants && osmRestaurants.length > 0,
 	});
 
 	if (isPending) {
@@ -61,7 +71,7 @@ function RestaurantComponent() {
 			address: restaurant.address || "",
 			latitude: restaurant.lat,
 			longitude: restaurant.lng,
-			rating: 4.0,
+			rating: ratings?.[restaurant.id]?.averageRating || 0,
 			cuisine: restaurant.cuisine || undefined,
 		}),
 	);

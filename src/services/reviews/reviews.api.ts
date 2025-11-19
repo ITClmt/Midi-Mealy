@@ -115,3 +115,51 @@ export const fetchTopRestaurants = createServerFn({ method: "POST" })
 
 		return topRestaurants;
 	});
+
+export const fetchRestaurantRatings = createServerFn({ method: "POST" })
+	.inputValidator((restaurantIds: string[]) => restaurantIds)
+	.handler(async ({ data: restaurantIds }) => {
+		const supabase = getSupabaseServerClient();
+
+		if (!restaurantIds.length) return {};
+
+		const { data: reviews, error } = await supabase
+			.from("reviews")
+			.select("restaurant_id, rating")
+			.in("restaurant_id", restaurantIds);
+
+		if (error) {
+			console.error("Error fetching reviews for ratings:", error);
+			throw new Error("Erreur lors de la récupération des notes");
+		}
+
+		// Aggregate ratings
+		const ratingsMap = reviews.reduce(
+			(acc, review) => {
+				if (!acc[review.restaurant_id]) {
+					acc[review.restaurant_id] = {
+						totalRating: 0,
+						count: 0,
+					};
+				}
+				acc[review.restaurant_id].totalRating += review.rating;
+				acc[review.restaurant_id].count += 1;
+				return acc;
+			},
+			{} as Record<string, { totalRating: number; count: number }>,
+		);
+
+		// Calculate averages
+		const result = Object.entries(ratingsMap).reduce(
+			(acc, [id, stats]) => {
+				acc[id] = {
+					averageRating: stats.totalRating / stats.count,
+					reviewCount: stats.count,
+				};
+				return acc;
+			},
+			{} as Record<string, { averageRating: number; reviewCount: number }>,
+		);
+
+		return result;
+	});

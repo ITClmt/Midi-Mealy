@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { MapPin } from "lucide-react";
+import { useState } from "react";
 import { RestaurantMapContainer } from "@/components/RestaurantMapContainer";
 import { RestaurantSearchInput } from "@/components/restaurants/RestaurantSearchInput";
 import type { Restaurant } from "@/services/restaurants/restaurants.types";
@@ -14,7 +14,10 @@ interface OfficeMapSectionProps {
 	restaurants: Restaurant[];
 }
 
-export function OfficeMapSection({ office, restaurants }: OfficeMapSectionProps) {
+export function OfficeMapSection({
+	office,
+	restaurants,
+}: OfficeMapSectionProps) {
 	const [search, setSearch] = useState("");
 	const [selectedRestaurantId, setSelectedRestaurantId] = useState<
 		string | undefined
@@ -38,7 +41,7 @@ export function OfficeMapSection({ office, restaurants }: OfficeMapSectionProps)
 	};
 
 	return (
-		<section className="m-0 sm:m-12 mb-0">
+		<section className="m-0 sm:m-12 mb-0 mt-12">
 			<div className="relative w-full mb-4">
 				<RestaurantSearchInput
 					restaurants={restaurants}
@@ -66,7 +69,6 @@ export function OfficeMapSection({ office, restaurants }: OfficeMapSectionProps)
 					restaurants={restaurants}
 					selectedRestaurantId={selectedRestaurantId}
 					onRestaurantClick={(restaurant) => {
-						console.log("Restaurant sélectionné:", restaurant);
 						setSelectedRestaurantId(restaurant.id);
 						setSearch(restaurant.name);
 					}}
