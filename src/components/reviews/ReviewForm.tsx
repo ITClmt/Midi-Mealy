@@ -1,11 +1,9 @@
-import { useId, useRef, useState } from "react";
+import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Search } from "lucide-react";
 import { toast } from "react-toastify";
 import { createReview } from "@/services/reviews/reviews.api";
 import type { Restaurant } from "@/services/restaurants/restaurants.types";
-import { Input } from "@/components/ui/input";
-import { useClickOutside } from "@/hooks/useClickOutside";
+import { RestaurantSearchInput } from "@/components/restaurants/RestaurantSearchInput";
 
 interface ReviewFormProps {
 	restaurants: Restaurant[];
@@ -16,12 +14,9 @@ export function ReviewForm({ restaurants }: ReviewFormProps) {
 	const [selectedReviewRestaurant, setSelectedReviewRestaurant] = useState<
 		Restaurant | undefined
 	>(undefined);
-	const [showReviewSuggestions, setShowReviewSuggestions] = useState(false);
 	const [rating, setRating] = useState(0);
 	const [comment, setComment] = useState("");
 	const [hoveredRating, setHoveredRating] = useState(0);
-	const reviewAutocompleteRef = useRef<HTMLDivElement>(null);
-	const reviewSuggestionsId = useId();
 
 	const { mutate: submitReview, isPending: isSubmittingReview } = useMutation({
 		mutationFn: createReview,
@@ -38,21 +33,9 @@ export function ReviewForm({ restaurants }: ReviewFormProps) {
 		},
 	});
 
-	// Filter restaurants for review search
-	const filteredReviewRestaurants =
-		restaurants?.filter(
-			(restaurant) =>
-				restaurant.name.toLowerCase().includes(reviewSearch.toLowerCase()) ||
-				restaurant.address?.toLowerCase().includes(reviewSearch.toLowerCase()),
-		) || [];
-
-	// Close review suggestions when clicking outside
-	useClickOutside(reviewAutocompleteRef, () => setShowReviewSuggestions(false));
-
 	const handleSelectReviewRestaurant = (restaurant: Restaurant) => {
 		setSelectedReviewRestaurant(restaurant);
 		setReviewSearch(restaurant.name);
-		setShowReviewSuggestions(false);
 	};
 
 	const handleSubmitReview = (e: React.FormEvent) => {
@@ -86,63 +69,26 @@ export function ReviewForm({ restaurants }: ReviewFormProps) {
 
 			<form onSubmit={handleSubmitReview} className="space-y-6">
 				{/* Restaurant Search for Review */}
-				<div className="relative" ref={reviewAutocompleteRef}>
+				<div className="relative">
 					<label
 						htmlFor="review-search"
 						className="block text-sm font-medium text-gray-700 mb-1"
 					>
 						Rechercher un restaurant
 					</label>
-					<div className="relative">
-						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-						<Input
-							id="review-search"
-							type="text"
-							placeholder="Nom du restaurant..."
-							value={reviewSearch}
-							onChange={(e) => {
-								setReviewSearch(e.target.value);
-								setShowReviewSuggestions(true);
-								if (e.target.value === "") {
-									setSelectedReviewRestaurant(undefined);
-								}
-							}}
-							onFocus={() => setShowReviewSuggestions(true)}
-							className="pl-10"
-							autoComplete="off"
-							aria-expanded={showReviewSuggestions}
-							aria-controls={reviewSuggestionsId}
-							role="combobox"
-						/>
-					</div>
-
-					{/* Suggestions */}
-					{showReviewSuggestions &&
-						reviewSearch.length > 0 &&
-						!selectedReviewRestaurant &&
-						filteredReviewRestaurants.length > 0 && (
-							<div
-								id={reviewSuggestionsId}
-								className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"
-								role="listbox"
-							>
-								{filteredReviewRestaurants.map((restaurant) => (
-									<button
-										key={restaurant.id}
-										type="button"
-										onClick={() => handleSelectReviewRestaurant(restaurant)}
-										className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0"
-									>
-										<div className="font-medium text-gray-900">
-											{restaurant.name}
-										</div>
-										<div className="text-sm text-gray-500">
-											{restaurant.address}
-										</div>
-									</button>
-								))}
-							</div>
-						)}
+					<RestaurantSearchInput
+						restaurants={restaurants}
+						value={reviewSearch}
+						onChange={(value) => {
+							setReviewSearch(value);
+							if (value === "") {
+								setSelectedReviewRestaurant(undefined);
+							}
+						}}
+						onSelect={handleSelectReviewRestaurant}
+						placeholder="Nom du restaurant..."
+						selectedRestaurantId={selectedReviewRestaurant?.id}
+					/>
 				</div>
 
 				{selectedReviewRestaurant && (
