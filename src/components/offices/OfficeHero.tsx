@@ -8,13 +8,13 @@ interface OfficeHeroProps {
 export function OfficeHero({ officeName, restaurantsLength }: OfficeHeroProps) {
 	return (
 		<section className="container mx-auto px-4">
-			<div className="text-center space-y-6 max-w-4xl mx-auto">
+			<div className="text-center space-y-8 max-w-4xl mx-auto pt-12 pb-8">
 				{/* Title & Description */}
-				<div className="space-y-4 pt-12">
-					<h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-red-600 via-orange-600 to-red-600 bg-clip-text text-transparent">
+				<div className="space-y-6">
+					<h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
 						Restaurants {officeName}
 					</h1>
-					<p className="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto">
+					<p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
 						Découvrez les meilleurs restaurants à proximité de {officeName}
 					</p>
 				</div>

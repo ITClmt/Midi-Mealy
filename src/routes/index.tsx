@@ -9,47 +9,40 @@ export const Route = createFileRoute("/")({
 
 function RouteComponent() {
 	return (
-		<main className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
-			{/* Hero Section */}
+		<main className="min-h-screen bg-background flex flex-col justify-center">
 			<section className="container mx-auto px-4 py-16">
-				<header className="text-center space-y-6 max-w-4xl mx-auto">
+				<div className="max-w-3xl mx-auto text-center space-y-8">
 					{/* Logo & Badge */}
-					<div className="flex flex-col items-center gap-4">
-						<div className="relative">
-							<div className="absolute inset-0 bg-red-600 rounded-full blur-2xl opacity-20 animate-pulse" />
-							<div className="relative bg-gradient-to-br from-red-600 to-orange-600 text-white p-6 rounded-3xl shadow-2xl">
-								<Utensils className="w-20 h-20" />
-							</div>
+					<div className="flex flex-col items-center gap-6">
+						<div className="p-4 bg-primary/10 rounded-2xl text-primary">
+							<Utensils className="w-12 h-12" />
 						</div>
-						<Badge variant="secondary" className="text-sm px-4 py-1">
-							🚀 Version Beta
+						<Badge variant="outline" className="text-sm px-3 py-1 font-normal">
+							v1.0 Beta
 						</Badge>
 					</div>
 
 					{/* Title & Description */}
-					<div className="space-y-4">
-						<h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-red-600 via-orange-600 to-red-600 bg-clip-text text-transparent animate-in fade-in slide-in-from-bottom-4 duration-1000">
+					<div className="space-y-6">
+						<h1 className="text-4xl md:text-6xl font-bold tracking-tight text-foreground">
 							Midi-Mealy
 						</h1>
-						<p className="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-5 duration-1000 delay-150">
-							Découvre et note les meilleurs restaurants autour de ton bureau
-							avec tes collègues
+						<p className="text-xl text-muted-foreground max-w-xl mx-auto leading-relaxed">
+							Découvrez et notez les meilleurs restaurants autour de votre
+							bureau. Simple, rapide, collaboratif.
 						</p>
 					</div>
 
 					{/* CTA Buttons */}
-					<div className="flex flex-wrap justify-center gap-4 pt-4 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
+					<div className="pt-4">
 						<Link to="/offices">
-							<Button
-								size="lg"
-								className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-lg px-8"
-							>
+							<Button size="lg" className="text-lg px-8 h-12 rounded-full">
 								<MapPin className="mr-2 h-5 w-5" />
-								Bureaux
+								Trouver mon bureau
 							</Button>
 						</Link>
 					</div>
-				</header>
+				</div>
 			</section>
 		</main>
 	);

@@ -13,34 +13,30 @@ function RouteComponent() {
 	const offices = Route.useLoaderData();
 
 	return (
-		<section className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
-			{/* Hero Section */}
-			<section className="container mx-auto px-4 py-16">
-				<div className="text-center space-y-6 max-w-4xl mx-auto">
+		<section className="min-h-screen bg-background py-16">
+			<div className="container mx-auto px-4">
+				<div className="max-w-3xl mx-auto text-center space-y-8 mb-16">
 					{/* Icon & Badge */}
-					<div className="flex flex-col items-center gap-4">
-						<div className="relative">
-							<div className="absolute inset-0 bg-blue-600 rounded-full blur-2xl opacity-20 animate-pulse" />
-							<div className="relative bg-gradient-to-br from-blue-600 to-cyan-600 text-white p-6 rounded-3xl shadow-2xl">
-								<Building2 className="w-20 h-20" />
-							</div>
+					<div className="flex flex-col items-center gap-6">
+						<div className="p-4 bg-primary/10 rounded-2xl text-primary">
+							<Building2 className="w-12 h-12" />
 						</div>
 					</div>
 
 					{/* Title & Description */}
-					<div className="space-y-4">
-						<h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600 bg-clip-text text-transparent animate-in fade-in slide-in-from-bottom-4 duration-1000">
+					<div className="space-y-6">
+						<h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
 							Nos Bureaux
 						</h1>
-						<p className="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-5 duration-1000 delay-150">
+						<p className="text-xl text-muted-foreground max-w-xl mx-auto leading-relaxed">
 							Découvrez nos bureaux et trouvez le restaurant parfait pour votre
-							pause déjeuner
+							pause déjeuner.
 						</p>
 					</div>
 				</div>
 
 				{/* Offices Grid */}
-				<section className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-500">
+				<section className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 					{offices?.map((office) => (
 						<OfficesCard key={office.id} office={office} />
 					))}
@@ -48,17 +44,17 @@ function RouteComponent() {
 
 				{/* Empty State */}
 				{offices?.length === 0 && (
-					<div className="text-center mt-16">
-						<div className="text-gray-400 text-6xl mb-4">🏢</div>
-						<h3 className="text-2xl font-bold text-gray-900 mb-2">
+					<div className="text-center mt-16 space-y-4">
+						<div className="text-6xl">🏢</div>
+						<h3 className="text-2xl font-bold text-foreground">
 							Aucun bureau trouvé
 						</h3>
-						<p className="text-gray-600">
+						<p className="text-muted-foreground">
 							Il n'y a pas encore de bureaux enregistrés.
 						</p>
 					</div>
 				)}
-			</section>
+			</div>
 		</section>
 	);
 }

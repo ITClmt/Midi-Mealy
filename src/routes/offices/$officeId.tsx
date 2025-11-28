@@ -47,14 +47,10 @@ function RestaurantComponent() {
 
 	if (isPending) {
 		return (
-			<section className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
-				<div className="container mx-auto px-4 py-16">
-					<div className="text-center space-y-6 max-w-4xl mx-auto">
-						<div className="flex flex-col items-center gap-4">
-							<div className="w-8 h-8 border-4 border-red-200 border-t-red-600 rounded-full animate-spin"></div>
-							<p className="text-gray-600">Chargement des restaurants...</p>
-						</div>
-					</div>
+			<section className="min-h-screen bg-background flex items-center justify-center">
+				<div className="flex flex-col items-center gap-4">
+					<div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+					<p className="text-muted-foreground">Chargement des restaurants...</p>
 				</div>
 			</section>
 		);
@@ -77,7 +73,7 @@ function RestaurantComponent() {
 	);
 
 	return (
-		<main className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
+		<main className="min-h-screen bg-background pb-16">
 			<OfficeHero
 				officeName={office.name}
 				restaurantsLength={mappedRestaurants.length}

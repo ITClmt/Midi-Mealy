@@ -55,16 +55,12 @@ function LoginForm() {
 	});
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 flex items-center justify-center p-4">
+		<div className="min-h-screen bg-background flex items-center justify-center p-4">
 			<div className="w-full max-w-md">
-				<Card className="shadow-lg border-0">
+				<Card className="border shadow-sm">
 					<CardHeader className="space-y-1 text-center">
-						<CardTitle className="text-2xl font-bold text-slate-900">
-							Connexion
-						</CardTitle>
-						<CardDescription className="text-slate-600">
-							Connectez-vous à votre compte
-						</CardDescription>
+						<CardTitle className="text-2xl font-bold">Connexion</CardTitle>
+						<CardDescription>Connectez-vous à votre compte</CardDescription>
 					</CardHeader>
 					<CardContent>
 						<form
@@ -106,11 +102,11 @@ function LoginForm() {
 					</CardContent>
 					<CardContent className="pt-0">
 						<div className="text-center">
-							<p className="text-sm text-slate-600">
+							<p className="text-sm text-muted-foreground">
 								Pas encore de compte ?{" "}
 								<Link
 									to="/auth/signup"
-									className="text-blue-600 hover:text-blue-500 font-medium"
+									className="text-primary hover:underline font-medium"
 								>
 									Créer un compte
 								</Link>
