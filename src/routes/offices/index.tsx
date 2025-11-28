@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Building2, MapPin } from "lucide-react";
+import { Building2 } from "lucide-react";
 import OfficesCard from "@/components/OfficesCard";
 import { fetchOffices } from "@/services/offices/offices.api";
-import type { OfficesCardProps } from "@/services/offices/offices.types";
 
 export const Route = createFileRoute("/offices/")({
 	component: RouteComponent,
