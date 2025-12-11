@@ -12,11 +12,8 @@ export function OfficeHero({ officeName, restaurantsLength }: OfficeHeroProps) {
 				{/* Title & Description */}
 				<div className="space-y-6">
 					<h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-						Restaurants {officeName}
+						Midi-Mealy chez <span className="underline">{officeName}</span>
 					</h1>
-					<p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-						Découvrez les meilleurs restaurants à proximité de {officeName}
-					</p>
 				</div>
 			</div>
 

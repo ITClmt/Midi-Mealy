@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OfficesIndexRouteImport } from './routes/offices/index'
+import { Route as ProfileUserIdRouteImport } from './routes/profile/$userId'
 import { Route as OfficesOfficeIdRouteImport } from './routes/offices/$officeId'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
@@ -23,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 const OfficesIndexRoute = OfficesIndexRouteImport.update({
   id: '/offices/',
   path: '/offices/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileUserIdRoute = ProfileUserIdRouteImport.update({
+  id: '/profile/$userId',
+  path: '/profile/$userId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OfficesOfficeIdRoute = OfficesOfficeIdRouteImport.update({
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/offices/$officeId': typeof OfficesOfficeIdRoute
+  '/profile/$userId': typeof ProfileUserIdRoute
   '/offices': typeof OfficesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/offices/$officeId': typeof OfficesOfficeIdRoute
+  '/profile/$userId': typeof ProfileUserIdRoute
   '/offices': typeof OfficesIndexRoute
 }
 export interface FileRoutesById {
@@ -61,6 +69,7 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/offices/$officeId': typeof OfficesOfficeIdRoute
+  '/profile/$userId': typeof ProfileUserIdRoute
   '/offices/': typeof OfficesIndexRoute
 }
 export interface FileRouteTypes {
@@ -70,15 +79,23 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/offices/$officeId'
+    | '/profile/$userId'
     | '/offices'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth/login' | '/auth/signup' | '/offices/$officeId' | '/offices'
+  to:
+    | '/'
+    | '/auth/login'
+    | '/auth/signup'
+    | '/offices/$officeId'
+    | '/profile/$userId'
+    | '/offices'
   id:
     | '__root__'
     | '/'
     | '/auth/login'
     | '/auth/signup'
     | '/offices/$officeId'
+    | '/profile/$userId'
     | '/offices/'
   fileRoutesById: FileRoutesById
 }
@@ -87,6 +104,7 @@ export interface RootRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
   OfficesOfficeIdRoute: typeof OfficesOfficeIdRoute
+  ProfileUserIdRoute: typeof ProfileUserIdRoute
   OfficesIndexRoute: typeof OfficesIndexRoute
 }
 
@@ -104,6 +122,13 @@ declare module '@tanstack/react-router' {
       path: '/offices'
       fullPath: '/offices'
       preLoaderRoute: typeof OfficesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/$userId': {
+      id: '/profile/$userId'
+      path: '/profile/$userId'
+      fullPath: '/profile/$userId'
+      preLoaderRoute: typeof ProfileUserIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/offices/$officeId': {
@@ -135,6 +160,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
   OfficesOfficeIdRoute: OfficesOfficeIdRoute,
+  ProfileUserIdRoute: ProfileUserIdRoute,
   OfficesIndexRoute: OfficesIndexRoute,
 }
 export const routeTree = rootRouteImport

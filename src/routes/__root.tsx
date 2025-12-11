@@ -36,6 +36,18 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 			},
 		};
 	},
+	notFoundComponent: () => (
+		<div className="flex flex-col items-center justify-center min-h-screen p-4">
+			<h1 className="text-4xl font-bold mb-4">404</h1>
+			<p className="text-xl text-muted-foreground mb-8">Page non trouvée</p>
+			<Link
+				to="/"
+				className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+			>
+				Retour à l'accueil
+			</Link>
+		</div>
+	),
 	head: () => ({
 		meta: [
 			// Encodage et titre
@@ -158,13 +170,20 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<HeadContent />
 			</head>
 			<body>
-				{authState?.isAuthenticated ? (
+				{authState?.isAuthenticated && authState.user ? (
 					<nav className="absolute top-4 right-4 flex gap-4">
 						<Link
 							to="/"
 							className="text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors duration-300"
 						>
 							Accueil
+						</Link>
+						<Link
+							to="/profile/$userId"
+							className="text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors duration-300"
+							params={{ userId: authState.user.id }}
+						>
+							Profile
 						</Link>
 						<Link
 							to="/"

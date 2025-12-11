@@ -44,6 +44,6 @@ export type AuthState =
 			user: User;
 	  };
 
-export type User = { email?: string; meta: UserMeta };
+export type User = { email?: string; meta: UserMeta; id: string };
 export type SignUpSchema = z.infer<typeof SignUpSchema>;
 export type LoginSchema = z.infer<typeof LoginSchema>;

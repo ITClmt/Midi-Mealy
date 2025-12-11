@@ -51,6 +51,7 @@ export function OfficeMapSection({
 					onClear={handleClearSearch}
 					placeholder="Rechercher un restaurant sur la carte"
 					selectedRestaurantId={selectedRestaurantId}
+					showSuggestionsProps={true}
 				/>
 			</div>
 

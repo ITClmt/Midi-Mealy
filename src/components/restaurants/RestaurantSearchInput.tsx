@@ -1,5 +1,5 @@
-import { useId, useRef, useState } from "react";
 import { Search, X } from "lucide-react";
+import { useId, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import type { Restaurant } from "@/services/restaurants/restaurants.types";
@@ -13,6 +13,7 @@ interface RestaurantSearchInputProps {
 	placeholder?: string;
 	selectedRestaurantId?: string;
 	className?: string;
+	showSuggestionsProps?: boolean;
 }
 
 export function RestaurantSearchInput({
@@ -23,6 +24,7 @@ export function RestaurantSearchInput({
 	onClear,
 	placeholder = "Rechercher un restaurant...",
 	selectedRestaurantId,
+	showSuggestionsProps,
 }: RestaurantSearchInputProps) {
 	const [showSuggestions, setShowSuggestions] = useState(false);
 	const autocompleteRef = useRef<HTMLDivElement>(null);
@@ -42,10 +44,7 @@ export function RestaurantSearchInput({
 		setShowSuggestions(false);
 	};
 
-	const handleKeyDown = (
-		e: React.KeyboardEvent,
-		restaurant?: Restaurant,
-	) => {
+	const handleKeyDown = (e: React.KeyboardEvent, restaurant?: Restaurant) => {
 		if (e.key === "Enter" || e.key === " ") {
 			e.preventDefault();
 			if (restaurant) {
@@ -89,7 +88,7 @@ export function RestaurantSearchInput({
 				)}
 			</div>
 
-			{showSuggestions && value.length > 0 && (
+			{showSuggestionsProps && showSuggestions && value.length > 0 && (
 				<div
 					id={suggestionsId}
 					className="absolute z-[1001] w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"

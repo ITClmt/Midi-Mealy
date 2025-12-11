@@ -40,6 +40,7 @@ const OfficesCard = ({ office }: OfficesCardProps) => {
 						to="/offices/$officeId"
 						params={{ officeId: office.id }}
 						className="flex items-center justify-center gap-2 w-full"
+						preload="viewport"
 					>
 						<Users className="w-4 h-4" />
 						Voir les restaurants

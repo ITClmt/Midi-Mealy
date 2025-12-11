@@ -1,0 +1,9 @@
+import type { User } from "@/services/auth/auth.schema";
+
+export const UserSection = ({ user }: { user: User }) => {
+	return (
+		<div className="flex flex-col items-center justify-center min-h-screen p-4">
+			Hello {user.meta.username}
+		</div>
+	);
+};

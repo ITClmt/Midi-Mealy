@@ -35,7 +35,7 @@ function RouteComponent() {
 
 					{/* CTA Buttons */}
 					<div className="pt-4">
-						<Link to="/offices">
+						<Link to="/offices" preload="render">
 							<Button size="lg" className="text-lg px-8 h-12 rounded-full">
 								<MapPin className="mr-2 h-5 w-5" />
 								Trouver mon bureau

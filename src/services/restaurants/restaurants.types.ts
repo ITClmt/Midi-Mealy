@@ -5,6 +5,7 @@ export interface Restaurant {
 	latitude: number;
 	longitude: number;
 	rating?: number;
+	reviewCount?: number;
 	cuisine?: string;
 }
 

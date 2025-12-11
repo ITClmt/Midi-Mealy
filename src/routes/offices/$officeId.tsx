@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { OfficeHero } from "@/components/offices/OfficeHero";
 import { OfficeMapSection } from "@/components/offices/OfficeMapSection";
-import { ReviewForm } from "@/components/reviews/ReviewForm";
+import { RestaurantList } from "@/components/restaurants/RestaurantList";
 import ReviewSection from "@/components/reviews/ReviewSection";
 import {
 	fetchOfficeById,
@@ -68,6 +68,7 @@ function RestaurantComponent() {
 			latitude: restaurant.lat,
 			longitude: restaurant.lng,
 			rating: ratings?.[restaurant.id]?.averageRating || 0,
+			reviewCount: ratings?.[restaurant.id]?.reviewCount || 0,
 			cuisine: restaurant.cuisine || undefined,
 		}),
 	);
@@ -79,9 +80,9 @@ function RestaurantComponent() {
 				restaurantsLength={mappedRestaurants.length}
 			/>
 
-			<ReviewForm restaurants={mappedRestaurants} />
-
 			<ReviewSection office={office} restaurants={mappedRestaurants} />
+
+			<RestaurantList restaurants={mappedRestaurants} />
 
 			{mappedRestaurants.length > 0 && (
 				<OfficeMapSection office={office} restaurants={mappedRestaurants} />

@@ -69,6 +69,7 @@ export const getUser = createServerFn().handler(async () => {
 		user: {
 			email: data.user.email,
 			meta: { username: data.user.user_metadata.name },
+			id: data.user.user_metadata.sub,
 		},
 	};
 });
