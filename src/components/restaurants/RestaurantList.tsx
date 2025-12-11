@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { RestaurantSearchInput } from "@/components/restaurants/RestaurantSearchInput";
 import {
@@ -173,6 +174,14 @@ export function RestaurantList({ restaurants }: { restaurants: Restaurant[] }) {
 														)}
 												</div>
 											)}
+										<Link
+											to="/restaurant/$restaurantId"
+											params={{ restaurantId: restaurant.id }}
+											className="text-blue-500 hover:underline text-xs ml-2"
+											preload="intent"
+										>
+											Notes le !
+										</Link>
 									</div>
 								</div>
 							</div>

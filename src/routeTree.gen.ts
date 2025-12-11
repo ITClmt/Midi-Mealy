@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OfficesIndexRouteImport } from './routes/offices/index'
+import { Route as RestaurantRestaurantIdRouteImport } from './routes/restaurant/$restaurantId'
 import { Route as ProfileUserIdRouteImport } from './routes/profile/$userId'
 import { Route as OfficesOfficeIdRouteImport } from './routes/offices/$officeId'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
@@ -24,6 +25,11 @@ const IndexRoute = IndexRouteImport.update({
 const OfficesIndexRoute = OfficesIndexRouteImport.update({
   id: '/offices/',
   path: '/offices/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RestaurantRestaurantIdRoute = RestaurantRestaurantIdRouteImport.update({
+  id: '/restaurant/$restaurantId',
+  path: '/restaurant/$restaurantId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileUserIdRoute = ProfileUserIdRouteImport.update({
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/auth/signup': typeof AuthSignupRoute
   '/offices/$officeId': typeof OfficesOfficeIdRoute
   '/profile/$userId': typeof ProfileUserIdRoute
+  '/restaurant/$restaurantId': typeof RestaurantRestaurantIdRoute
   '/offices': typeof OfficesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/auth/signup': typeof AuthSignupRoute
   '/offices/$officeId': typeof OfficesOfficeIdRoute
   '/profile/$userId': typeof ProfileUserIdRoute
+  '/restaurant/$restaurantId': typeof RestaurantRestaurantIdRoute
   '/offices': typeof OfficesIndexRoute
 }
 export interface FileRoutesById {
@@ -70,6 +78,7 @@ export interface FileRoutesById {
   '/auth/signup': typeof AuthSignupRoute
   '/offices/$officeId': typeof OfficesOfficeIdRoute
   '/profile/$userId': typeof ProfileUserIdRoute
+  '/restaurant/$restaurantId': typeof RestaurantRestaurantIdRoute
   '/offices/': typeof OfficesIndexRoute
 }
 export interface FileRouteTypes {
@@ -80,6 +89,7 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/offices/$officeId'
     | '/profile/$userId'
+    | '/restaurant/$restaurantId'
     | '/offices'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -88,6 +98,7 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/offices/$officeId'
     | '/profile/$userId'
+    | '/restaurant/$restaurantId'
     | '/offices'
   id:
     | '__root__'
@@ -96,6 +107,7 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/offices/$officeId'
     | '/profile/$userId'
+    | '/restaurant/$restaurantId'
     | '/offices/'
   fileRoutesById: FileRoutesById
 }
@@ -105,6 +117,7 @@ export interface RootRouteChildren {
   AuthSignupRoute: typeof AuthSignupRoute
   OfficesOfficeIdRoute: typeof OfficesOfficeIdRoute
   ProfileUserIdRoute: typeof ProfileUserIdRoute
+  RestaurantRestaurantIdRoute: typeof RestaurantRestaurantIdRoute
   OfficesIndexRoute: typeof OfficesIndexRoute
 }
 
@@ -122,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/offices'
       fullPath: '/offices'
       preLoaderRoute: typeof OfficesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/restaurant/$restaurantId': {
+      id: '/restaurant/$restaurantId'
+      path: '/restaurant/$restaurantId'
+      fullPath: '/restaurant/$restaurantId'
+      preLoaderRoute: typeof RestaurantRestaurantIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile/$userId': {
@@ -161,6 +181,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthSignupRoute: AuthSignupRoute,
   OfficesOfficeIdRoute: OfficesOfficeIdRoute,
   ProfileUserIdRoute: ProfileUserIdRoute,
+  RestaurantRestaurantIdRoute: RestaurantRestaurantIdRoute,
   OfficesIndexRoute: OfficesIndexRoute,
 }
 export const routeTree = rootRouteImport

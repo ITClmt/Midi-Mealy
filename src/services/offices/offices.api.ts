@@ -31,6 +31,55 @@ export const fetchOfficeById = createServerFn({ method: "GET" })
 	});
 
 /**
+ * Récupère un restaurant spécifique depuis le cache OSM par son ID
+ * @param data - L'ID du restaurant (format: osm_XXXXX)
+ * @returns Le restaurant trouvé ou null
+ *
+ * @example
+ * const restaurant = await fetchOSMRestaurantById({
+ *   data: "osm_12345678"
+ * });
+ */
+export const fetchOSMRestaurantById = createServerFn({ method: "GET" })
+	.inputValidator((id: string) => id)
+	.handler(async ({ data: restaurantId }) => {
+		const supabase = getSupabaseServerClient();
+
+		try {
+			// Rechercher le restaurant dans le cache
+			const { data: cachedData, error: cacheError } = await supabase
+				.from("osm_restaurants_cache")
+				.select("*")
+				.eq("id", restaurantId)
+				.gt("expires_at", new Date().toISOString())
+				.single();
+
+			if (cacheError || !cachedData) {
+				throw new Error("Restaurant non trouvé dans le cache");
+			}
+
+			// Convertir les données du cache au format Restaurant
+			const restaurant: Restaurant = {
+				id: cachedData.id,
+				name: cachedData.name,
+				lat: cachedData.lat,
+				lng: cachedData.lng,
+				cuisine: cachedData.cuisine,
+				address: cachedData.address,
+				phone: cachedData.phone,
+				website: cachedData.website,
+				opening_hours: cachedData.opening_hours,
+				source: cachedData.source,
+			};
+
+			return restaurant;
+		} catch (error) {
+			console.error("Erreur dans fetchOSMRestaurantById:", error);
+			throw new Error("Restaurant introuvable ou expiré");
+		}
+	});
+
+/**
  * Récupère les restaurants depuis OpenStreetMap dans une zone donnée avec cache Supabase
  * @param data - Objet contenant lat, lng et optionnellement radius
  * @returns Liste des restaurants trouvés avec leurs informations
