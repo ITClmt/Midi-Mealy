@@ -1,6 +1,6 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { UtensilsCrossed } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { SignUpForm } from "@/components/auth/SignupForm";
 import { Badge } from "@/components/ui/badge";

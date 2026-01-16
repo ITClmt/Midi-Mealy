@@ -127,7 +127,8 @@ export const RestaurantMap = ({
           <div class="flex items-center gap-2 flex-wrap">
             ${restaurant.cuisine ? `<span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-900 text-xs leading-tight font-medium">🍽️ ${restaurant.cuisine}</span>` : ""}
             ${restaurant.rating ? `<span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-900 text-xs leading-tight font-medium">⭐ ${restaurant.rating}/5</span>` : ""}
-          </div>`;
+          </div>
+		</div>`;
 
 			marker.bindPopup(popupContent);
 

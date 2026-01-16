@@ -57,7 +57,7 @@ function MapComponent() {
 							officeLogoUrl={office.logo || ""}
 							center={[office.lat, office.lng]}
 							zoom={15}
-							className="w-full h-[calc(100vh-200px)]"
+							className="w-full h-[calc(100vh-230px)] md:h-[calc(100vh-200px)]"
 							restaurants={restaurants}
 						/>
 					</div>
