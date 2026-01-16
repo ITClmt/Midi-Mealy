@@ -1,10 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-	createFileRoute,
-	Link,
-	redirect,
-	useRouter,
-} from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -17,17 +12,15 @@ import { useAppForm } from "@/hooks/form";
 import { signUp } from "@/services/auth/auth.api";
 import type { SignUpSchema } from "@/services/auth/auth.schema";
 
-export const Route = createFileRoute("/auth/signup")({
-	component: SignUpForm,
-	beforeLoad: async ({ context }) => {
-		const { authState } = context;
-		if (authState.isAuthenticated) {
-			throw redirect({ to: "/" });
-		}
-	},
-});
+interface SignUpFormProps {
+	onToggleMode?: () => void;
+	showToggle?: boolean;
+}
 
-function SignUpForm() {
+export function SignUpForm({
+	onToggleMode,
+	showToggle = true,
+}: SignUpFormProps) {
 	const queryClient = useQueryClient();
 	const router = useRouter();
 
@@ -54,7 +47,7 @@ function SignUpForm() {
 	});
 
 	return (
-		<div className="min-h-screen bg-background flex items-center justify-center p-4">
+		<div className="bg-background flex items-center justify-center p-4">
 			<div className="w-full max-w-md">
 				<Card className="border shadow-sm">
 					<CardHeader className="space-y-1 text-center">
@@ -116,19 +109,22 @@ function SignUpForm() {
 							</div>
 						</form>
 					</CardContent>
-					<CardContent className="pt-0">
-						<div className="text-center">
-							<p className="text-sm text-muted-foreground">
-								Déjà un compte ?{" "}
-								<Link
-									to="/auth/login"
-									className="text-primary hover:underline font-medium"
-								>
-									Se connecter
-								</Link>
-							</p>
-						</div>
-					</CardContent>
+					{showToggle && (
+						<CardContent className="pt-0">
+							<div className="text-center">
+								<p className="text-sm text-muted-foreground">
+									Déjà un compte ?{" "}
+									<button
+										type="button"
+										onClick={onToggleMode}
+										className="text-primary hover:underline font-medium"
+									>
+										Se connecter
+									</button>
+								</p>
+							</div>
+						</CardContent>
+					)}
 				</Card>
 			</div>
 		</div>

@@ -1,10 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-	createFileRoute,
-	Link,
-	redirect,
-	useNavigate,
-} from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -17,17 +12,12 @@ import { useAppForm } from "@/hooks/form";
 import { login } from "@/services/auth/auth.api";
 import type { LoginSchema } from "@/services/auth/auth.schema";
 
-export const Route = createFileRoute("/auth/login")({
-	component: LoginForm,
-	beforeLoad: async ({ context }) => {
-		const { authState } = context;
-		if (authState.isAuthenticated) {
-			throw redirect({ to: "/" });
-		}
-	},
-});
+interface LoginFormProps {
+	onToggleMode?: () => void;
+	showToggle?: boolean;
+}
 
-function LoginForm() {
+export function LoginForm({ onToggleMode, showToggle = true }: LoginFormProps) {
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 
@@ -40,7 +30,7 @@ function LoginForm() {
 			}
 
 			queryClient.resetQueries();
-			navigate({ to: "/" });
+			navigate({ to: "/offices" });
 		},
 	});
 
@@ -55,7 +45,7 @@ function LoginForm() {
 	});
 
 	return (
-		<div className="min-h-screen bg-background flex items-center justify-center p-4">
+		<div className="bg-background flex items-center justify-center p-4">
 			<div className="w-full max-w-md">
 				<Card className="border shadow-sm">
 					<CardHeader className="space-y-1 text-center">
@@ -100,19 +90,22 @@ function LoginForm() {
 							</div>
 						</form>
 					</CardContent>
-					<CardContent className="pt-0">
-						<div className="text-center">
-							<p className="text-sm text-muted-foreground">
-								Pas encore de compte ?{" "}
-								<Link
-									to="/auth/signup"
-									className="text-primary hover:underline font-medium"
-								>
-									Créer un compte
-								</Link>
-							</p>
-						</div>
-					</CardContent>
+					{showToggle && (
+						<CardContent className="pt-0">
+							<div className="text-center">
+								<p className="text-sm text-muted-foreground">
+									Pas encore de compte ?{" "}
+									<button
+										type="button"
+										onClick={onToggleMode}
+										className="text-primary hover:underline font-medium"
+									>
+										Créer un compte
+									</button>
+								</p>
+							</div>
+						</CardContent>
+					)}
 				</Card>
 			</div>
 		</div>

@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import type { Office } from "@/services/offices/offices.types";
 import type { Restaurant } from "@/services/restaurants/restaurants.types";
 import { fetchTopRestaurants } from "@/services/reviews/reviews.api";
@@ -43,11 +44,17 @@ export default function ReviewSection({
 			</h2>
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 				{topRestaurants.map((restaurant, index) => (
-					<ReviewCard
+					<Link
 						key={restaurant.id}
-						review={restaurant}
-						rank={index + 1}
-					/>
+						to="/restaurant/$restaurantId"
+						params={{ restaurantId: restaurant.id }}
+					>
+						<ReviewCard
+							key={restaurant.id}
+							review={restaurant}
+							rank={index + 1}
+						/>
+					</Link>
 				))}
 			</div>
 		</section>

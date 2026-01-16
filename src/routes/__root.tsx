@@ -6,7 +6,8 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { Bounce, ToastContainer } from "react-toastify";
-import { getUser, signOut } from "@/services/auth/auth.api";
+import { TopNavbar } from "@/components/layout/TopNavbar";
+import { getUser } from "@/services/auth/auth.api";
 import appCss from "../styles.css?url";
 
 interface MyRouterContext {
@@ -170,54 +171,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<HeadContent />
 			</head>
 			<body>
-				{authState?.isAuthenticated && authState.user ? (
-					<nav className="absolute top-4 right-4 flex gap-4">
-						<Link
-							to="/"
-							className="text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors duration-300"
-						>
-							Accueil
-						</Link>
-						<Link
-							to="/profile/$userId"
-							className="text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors duration-300"
-							params={{ userId: authState.user.id }}
-						>
-							Profile
-						</Link>
-						<Link
-							to="/"
-							className="text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors duration-300"
-							onClick={() => {
-								signOut();
-							}}
-						>
-							Se déconnecter
-						</Link>
-					</nav>
-				) : (
-					<nav className="absolute top-4 right-4 flex gap-4">
-						<Link
-							to="/"
-							className="text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors duration-300"
-						>
-							Accueil
-						</Link>
-						<Link
-							to="/auth/signup"
-							className="text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors duration-300"
-						>
-							Crée un compte
-						</Link>
-						<Link
-							to="/auth/login"
-							className="text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors duration-300"
-						>
-							Connexion
-						</Link>
-					</nav>
-				)}
-				{children}
+				<div className="min-h-screen bg-background flex flex-col">
+					<TopNavbar
+						isAuthenticated={authState?.isAuthenticated}
+						username={authState?.user?.meta?.username || authState?.user?.email}
+					/>
+					<main className="flex-1 overflow-auto">{children}</main>
+				</div>
 				<Scripts />
 			</body>
 			<ToastContainer

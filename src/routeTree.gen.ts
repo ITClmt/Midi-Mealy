@@ -14,8 +14,8 @@ import { Route as OfficesIndexRouteImport } from './routes/offices/index'
 import { Route as RestaurantRestaurantIdRouteImport } from './routes/restaurant/$restaurantId'
 import { Route as ProfileUserIdRouteImport } from './routes/profile/$userId'
 import { Route as OfficesOfficeIdRouteImport } from './routes/offices/$officeId'
-import { Route as AuthSignupRouteImport } from './routes/auth/signup'
-import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as OfficesOfficeIdSearchRouteImport } from './routes/offices/$officeId.search'
+import { Route as OfficesOfficeIdMapRouteImport } from './routes/offices/$officeId.map'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -42,80 +42,78 @@ const OfficesOfficeIdRoute = OfficesOfficeIdRouteImport.update({
   path: '/offices/$officeId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthSignupRoute = AuthSignupRouteImport.update({
-  id: '/auth/signup',
-  path: '/auth/signup',
-  getParentRoute: () => rootRouteImport,
+const OfficesOfficeIdSearchRoute = OfficesOfficeIdSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => OfficesOfficeIdRoute,
 } as any)
-const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/auth/login',
-  path: '/auth/login',
-  getParentRoute: () => rootRouteImport,
+const OfficesOfficeIdMapRoute = OfficesOfficeIdMapRouteImport.update({
+  id: '/map',
+  path: '/map',
+  getParentRoute: () => OfficesOfficeIdRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth/login': typeof AuthLoginRoute
-  '/auth/signup': typeof AuthSignupRoute
-  '/offices/$officeId': typeof OfficesOfficeIdRoute
+  '/offices/$officeId': typeof OfficesOfficeIdRouteWithChildren
   '/profile/$userId': typeof ProfileUserIdRoute
   '/restaurant/$restaurantId': typeof RestaurantRestaurantIdRoute
   '/offices': typeof OfficesIndexRoute
+  '/offices/$officeId/map': typeof OfficesOfficeIdMapRoute
+  '/offices/$officeId/search': typeof OfficesOfficeIdSearchRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth/login': typeof AuthLoginRoute
-  '/auth/signup': typeof AuthSignupRoute
-  '/offices/$officeId': typeof OfficesOfficeIdRoute
+  '/offices/$officeId': typeof OfficesOfficeIdRouteWithChildren
   '/profile/$userId': typeof ProfileUserIdRoute
   '/restaurant/$restaurantId': typeof RestaurantRestaurantIdRoute
   '/offices': typeof OfficesIndexRoute
+  '/offices/$officeId/map': typeof OfficesOfficeIdMapRoute
+  '/offices/$officeId/search': typeof OfficesOfficeIdSearchRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/auth/login': typeof AuthLoginRoute
-  '/auth/signup': typeof AuthSignupRoute
-  '/offices/$officeId': typeof OfficesOfficeIdRoute
+  '/offices/$officeId': typeof OfficesOfficeIdRouteWithChildren
   '/profile/$userId': typeof ProfileUserIdRoute
   '/restaurant/$restaurantId': typeof RestaurantRestaurantIdRoute
   '/offices/': typeof OfficesIndexRoute
+  '/offices/$officeId/map': typeof OfficesOfficeIdMapRoute
+  '/offices/$officeId/search': typeof OfficesOfficeIdSearchRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/auth/login'
-    | '/auth/signup'
     | '/offices/$officeId'
     | '/profile/$userId'
     | '/restaurant/$restaurantId'
     | '/offices'
+    | '/offices/$officeId/map'
+    | '/offices/$officeId/search'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/auth/login'
-    | '/auth/signup'
     | '/offices/$officeId'
     | '/profile/$userId'
     | '/restaurant/$restaurantId'
     | '/offices'
+    | '/offices/$officeId/map'
+    | '/offices/$officeId/search'
   id:
     | '__root__'
     | '/'
-    | '/auth/login'
-    | '/auth/signup'
     | '/offices/$officeId'
     | '/profile/$userId'
     | '/restaurant/$restaurantId'
     | '/offices/'
+    | '/offices/$officeId/map'
+    | '/offices/$officeId/search'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthLoginRoute: typeof AuthLoginRoute
-  AuthSignupRoute: typeof AuthSignupRoute
-  OfficesOfficeIdRoute: typeof OfficesOfficeIdRoute
+  OfficesOfficeIdRoute: typeof OfficesOfficeIdRouteWithChildren
   ProfileUserIdRoute: typeof ProfileUserIdRoute
   RestaurantRestaurantIdRoute: typeof RestaurantRestaurantIdRoute
   OfficesIndexRoute: typeof OfficesIndexRoute
@@ -158,28 +156,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OfficesOfficeIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/signup': {
-      id: '/auth/signup'
-      path: '/auth/signup'
-      fullPath: '/auth/signup'
-      preLoaderRoute: typeof AuthSignupRouteImport
-      parentRoute: typeof rootRouteImport
+    '/offices/$officeId/search': {
+      id: '/offices/$officeId/search'
+      path: '/search'
+      fullPath: '/offices/$officeId/search'
+      preLoaderRoute: typeof OfficesOfficeIdSearchRouteImport
+      parentRoute: typeof OfficesOfficeIdRoute
     }
-    '/auth/login': {
-      id: '/auth/login'
-      path: '/auth/login'
-      fullPath: '/auth/login'
-      preLoaderRoute: typeof AuthLoginRouteImport
-      parentRoute: typeof rootRouteImport
+    '/offices/$officeId/map': {
+      id: '/offices/$officeId/map'
+      path: '/map'
+      fullPath: '/offices/$officeId/map'
+      preLoaderRoute: typeof OfficesOfficeIdMapRouteImport
+      parentRoute: typeof OfficesOfficeIdRoute
     }
   }
 }
 
+interface OfficesOfficeIdRouteChildren {
+  OfficesOfficeIdMapRoute: typeof OfficesOfficeIdMapRoute
+  OfficesOfficeIdSearchRoute: typeof OfficesOfficeIdSearchRoute
+}
+
+const OfficesOfficeIdRouteChildren: OfficesOfficeIdRouteChildren = {
+  OfficesOfficeIdMapRoute: OfficesOfficeIdMapRoute,
+  OfficesOfficeIdSearchRoute: OfficesOfficeIdSearchRoute,
+}
+
+const OfficesOfficeIdRouteWithChildren = OfficesOfficeIdRoute._addFileChildren(
+  OfficesOfficeIdRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthLoginRoute: AuthLoginRoute,
-  AuthSignupRoute: AuthSignupRoute,
-  OfficesOfficeIdRoute: OfficesOfficeIdRoute,
+  OfficesOfficeIdRoute: OfficesOfficeIdRouteWithChildren,
   ProfileUserIdRoute: ProfileUserIdRoute,
   RestaurantRestaurantIdRoute: RestaurantRestaurantIdRoute,
   OfficesIndexRoute: OfficesIndexRoute,

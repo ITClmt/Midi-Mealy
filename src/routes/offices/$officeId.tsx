@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useMatches } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { Sidebar } from "@/components/layout/Sidebar";
 import { OfficeHero } from "@/components/offices/OfficeHero";
-import { OfficeMapSection } from "@/components/offices/OfficeMapSection";
-import { RestaurantList } from "@/components/restaurants/RestaurantList";
 import ReviewSection from "@/components/reviews/ReviewSection";
 import {
 	fetchOfficeById,
@@ -13,15 +13,31 @@ import type { Restaurant } from "@/services/restaurants/restaurants.types";
 import { fetchRestaurantRatings } from "@/services/reviews/reviews.api";
 
 export const Route = createFileRoute("/offices/$officeId")({
-	component: RestaurantComponent,
+	component: OfficeLayoutComponent,
 	ssr: "data-only",
 	loader: async ({ params }) => {
 		return await fetchOfficeById({ data: Number(params.officeId) });
 	},
 });
 
-function RestaurantComponent() {
+function OfficeLayoutComponent() {
 	const office = Route.useLoaderData();
+	const { officeId } = Route.useParams();
+	const { authState } = Route.useRouteContext();
+	const matches = useMatches();
+
+	// Sauvegarder le dernier officeId visité
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			sessionStorage.setItem("lastOfficeId", officeId);
+		}
+	}, [officeId]);
+
+	// Vérifier si on est sur une route enfant (search, map)
+	const isChildRoute = matches.some(
+		(match) =>
+			match.routeId.includes("/search") || match.routeId.includes("/map"),
+	);
 
 	const {
 		isPending,
@@ -47,17 +63,27 @@ function RestaurantComponent() {
 
 	if (isPending) {
 		return (
-			<section className="min-h-screen bg-background flex items-center justify-center">
-				<div className="flex flex-col items-center gap-4">
-					<div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-					<p className="text-muted-foreground">Chargement des restaurants...</p>
-				</div>
-			</section>
+			<div className="flex flex-1">
+				<Sidebar officeId={officeId} userId={authState?.user?.id} />
+				<section className="flex-1 flex items-center justify-center">
+					<div className="flex flex-col items-center gap-4">
+						<div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+						<p className="text-muted-foreground">
+							Chargement des restaurants...
+						</p>
+					</div>
+				</section>
+			</div>
 		);
 	}
 
 	if (isError) {
-		return <div>Error: {error?.message}</div>;
+		return (
+			<div className="flex flex-1">
+				<Sidebar officeId={officeId} userId={authState?.user?.id} />
+				<div className="flex-1 p-6">Error: {error?.message}</div>
+			</div>
+		);
 	}
 
 	const mappedRestaurants: Restaurant[] = (osmRestaurants || []).map(
@@ -73,20 +99,22 @@ function RestaurantComponent() {
 		}),
 	);
 
+	// Si on est sur une route enfant, on affiche le Outlet
+	if (isChildRoute) {
+		return <Outlet />;
+	}
+
+	// Sinon on affiche le contenu par défaut (page principale de l'office)
 	return (
-		<main className="min-h-screen bg-background pb-16">
-			<OfficeHero
-				officeName={office.name}
-				restaurantsLength={mappedRestaurants.length}
-			/>
-
-			<ReviewSection office={office} restaurants={mappedRestaurants} />
-
-			<RestaurantList restaurants={mappedRestaurants} />
-
-			{mappedRestaurants.length > 0 && (
-				<OfficeMapSection office={office} restaurants={mappedRestaurants} />
-			)}
-		</main>
+		<div className="flex flex-1">
+			<Sidebar officeId={officeId} userId={authState?.user?.id} />
+			<main className="flex-1 bg-background pb-16 md:pb-0 overflow-auto">
+				<OfficeHero
+					officeName={office.name}
+					restaurantsLength={mappedRestaurants.length}
+				/>
+				<ReviewSection office={office} restaurants={mappedRestaurants} />
+			</main>
+		</div>
 	);
 }

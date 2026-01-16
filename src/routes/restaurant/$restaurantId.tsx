@@ -13,7 +13,7 @@ function RouteComponent() {
 	const { restaurantId } = Route.useParams();
 
 	const {
-		isPending: isLoadingRestaurant,
+		isPending,
 		isError,
 		data: osmRestaurant,
 		error,
@@ -34,7 +34,7 @@ function RouteComponent() {
 		enabled: !!osmRestaurant,
 	});
 
-	if (isLoadingRestaurant) {
+	if (isPending) {
 		return (
 			<section className="min-h-screen bg-background flex items-center justify-center">
 				<div className="flex flex-col items-center gap-4">
