@@ -1,16 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Map as MapIcon } from "lucide-react";
-import { useEffect } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { RestaurantMap } from "@/components/RestaurantMap";
-import {
-	fetchOfficeById,
-	fetchOSMRestaurants,
-} from "@/services/offices/offices.api";
-import type { Restaurant as OSMRestaurant } from "@/services/offices/offices.types";
-import type { Restaurant } from "@/services/restaurants/restaurants.types";
-import { fetchRestaurantRatings } from "@/services/reviews/reviews.api";
+import { useOfficeRestaurants } from "@/hooks/useOfficeRestaurants";
+import { fetchOfficeById } from "@/services/offices/offices.api";
 
 export const Route = createFileRoute("/offices/$officeId/map")({
 	component: MapComponent,
@@ -24,42 +17,7 @@ function MapComponent() {
 	const { officeId } = Route.useParams();
 	const { authState } = Route.useRouteContext();
 
-	// Sauvegarder le dernier officeId visité
-	useEffect(() => {
-		if (typeof window !== "undefined") {
-			sessionStorage.setItem("lastOfficeId", officeId);
-		}
-	}, [officeId]);
-
-	const { data: osmRestaurants, isPending } = useQuery({
-		queryKey: ["restaurants", office.id],
-		queryFn: () =>
-			fetchOSMRestaurants({
-				data: { lat: office.lat, lng: office.lng },
-			}),
-	});
-
-	const { data: ratings } = useQuery({
-		queryKey: ["restaurant-ratings", office.id],
-		queryFn: () =>
-			fetchRestaurantRatings({
-				data: (osmRestaurants || []).map((r) => r.id),
-			}),
-		enabled: !!osmRestaurants && osmRestaurants.length > 0,
-	});
-
-	const mappedRestaurants: Restaurant[] = (osmRestaurants || []).map(
-		(restaurant: OSMRestaurant) => ({
-			id: restaurant.id,
-			name: restaurant.name,
-			address: restaurant.address || "",
-			latitude: restaurant.lat,
-			longitude: restaurant.lng,
-			rating: ratings?.[restaurant.id]?.averageRating || 0,
-			reviewCount: ratings?.[restaurant.id]?.reviewCount || 0,
-			cuisine: restaurant.cuisine || undefined,
-		}),
-	);
+	const { restaurants, isPending } = useOfficeRestaurants(office, officeId);
 
 	if (isPending) {
 		return (
@@ -100,7 +58,7 @@ function MapComponent() {
 							center={[office.lat, office.lng]}
 							zoom={15}
 							className="w-full h-[calc(100vh-200px)]"
-							restaurants={mappedRestaurants}
+							restaurants={restaurants}
 						/>
 					</div>
 				</div>

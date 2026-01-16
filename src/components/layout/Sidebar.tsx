@@ -7,7 +7,12 @@ interface SidebarProps {
 }
 
 interface NavItem {
-	to: string;
+	to:
+		| "/offices/$officeId"
+		| "/offices/$officeId/search"
+		| "/offices/$officeId/map"
+		| "/profile/$userId";
+	params: { officeId: string } | { userId: string };
 	icon: React.ReactNode;
 	label: string;
 	isActive: boolean;
@@ -21,30 +26,38 @@ export function Sidebar({ officeId, userId }: SidebarProps) {
 	// Les routes sont relatives à l'office actuel
 	const navItems: NavItem[] = [
 		{
-			to: `/offices/${officeId}`,
+			to: "/offices/$officeId",
+			params: { officeId },
 			icon: <Home className="w-5 h-5" />,
 			label: "Restaurants",
 			isActive: currentPath === `/offices/${officeId}`,
 		},
 		{
-			to: `/offices/${officeId}/search`,
+			to: "/offices/$officeId/search",
+			params: { officeId },
 			icon: <Search className="w-5 h-5" />,
 			label: "Recherche",
 			isActive: currentPath.includes("/search"),
 		},
 		{
-			to: `/offices/${officeId}/map`,
+			to: "/offices/$officeId/map",
+			params: { officeId },
 			icon: <MapIcon className="w-5 h-5" />,
 			label: "Carte",
 			isActive: currentPath.includes("/map"),
 		},
-		{
-			to: userId ? `/profile/${userId}` : "#",
-			icon: <User className="w-5 h-5" />,
-			label: "Profil",
-			isActive: currentPath.startsWith("/profile"),
-			hidden: !userId, // Cacher si pas connecté
-		},
+		...(userId
+			? [
+					{
+						to: "/profile/$userId" as const,
+						params: { userId },
+						icon: <User className="w-5 h-5" />,
+						label: "Profil",
+						isActive: currentPath.startsWith("/profile"),
+						hidden: false,
+					},
+				]
+			: []),
 	];
 
 	// Filtrer les items cachés
@@ -60,6 +73,9 @@ export function Sidebar({ officeId, userId }: SidebarProps) {
 							<li key={item.to}>
 								<Link
 									to={item.to}
+									params={
+										item.params as { officeId: string } | { userId: string }
+									}
 									className={`
 										flex flex-col items-center justify-center
 										w-12 h-12 rounded-xl
@@ -87,6 +103,9 @@ export function Sidebar({ officeId, userId }: SidebarProps) {
 						<li key={item.to}>
 							<Link
 								to={item.to}
+								params={
+									item.params as { officeId: string } | { userId: string }
+								}
 								className={`
 									flex flex-col items-center justify-center gap-1
 									w-14 h-14 rounded-xl

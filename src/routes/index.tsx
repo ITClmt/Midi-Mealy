@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { UtensilsCrossed } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { SignUpForm } from "@/components/auth/SignupForm";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,11 @@ export const Route = createFileRoute("/")({
 
 function RouteComponent() {
 	const [isLogin, setIsLogin] = useState(true);
+	const { authState } = Route.useRouteContext();
+
+	if (authState?.user) {
+		return <Navigate to="/offices" />;
+	}
 
 	const toggleMode = () => {
 		setIsLogin(!isLogin);

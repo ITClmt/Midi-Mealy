@@ -179,20 +179,20 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					<main className="flex-1 overflow-auto">{children}</main>
 				</div>
 				<Scripts />
+				<ToastContainer
+					position="top-right"
+					autoClose={4000}
+					hideProgressBar={false}
+					newestOnTop={false}
+					closeOnClick={false}
+					rtl={false}
+					pauseOnFocusLoss
+					draggable
+					pauseOnHover
+					theme="light"
+					transition={Bounce}
+				/>
 			</body>
-			<ToastContainer
-				position="top-right"
-				autoClose={4000}
-				hideProgressBar={false}
-				newestOnTop={false}
-				closeOnClick={false}
-				rtl={false}
-				pauseOnFocusLoss
-				draggable
-				pauseOnHover
-				theme="light"
-				transition={Bounce}
-			/>
 		</html>
 	);
 }
