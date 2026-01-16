@@ -16,6 +16,20 @@ export const createReview = createServerFn({ method: "POST" })
 			throw new Error("Vous devez être connecté pour laisser un avis");
 		}
 
+		// Check if user already has a review for this restaurant
+		const { data: existingReview } = await supabase
+			.from("reviews")
+			.select("id")
+			.eq("restaurant_id", data.restaurant_id)
+			.eq("user_id", user.id)
+			.single();
+
+		if (existingReview) {
+			throw new Error(
+				"Vous avez déjà laissé un avis pour ce restaurant. Modifiez-le plutôt.",
+			);
+		}
+
 		const { data: review, error } = await supabase
 			.from("reviews")
 			.insert({
@@ -34,6 +48,90 @@ export const createReview = createServerFn({ method: "POST" })
 		}
 
 		return review as Review;
+	});
+
+export const updateReview = createServerFn({ method: "POST" })
+	.inputValidator(
+		(data: { reviewId: string; rating: number; comment?: string }) => data,
+	)
+	.handler(async ({ data }) => {
+		const supabase = getSupabaseServerClient();
+
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			throw new Error("Vous devez être connecté pour modifier un avis");
+		}
+
+		const { data: review, error } = await supabase
+			.from("reviews")
+			.update({
+				rating: data.rating,
+				comment: data.comment,
+			})
+			.eq("id", data.reviewId)
+			.eq("user_id", user.id) // Ensure user can only update their own review
+			.select()
+			.single();
+
+		if (error) {
+			console.error("Error updating review:", error);
+			throw new Error("Erreur lors de la modification de l'avis");
+		}
+
+		return review as Review;
+	});
+
+export const deleteReview = createServerFn({ method: "POST" })
+	.inputValidator((reviewId: string) => reviewId)
+	.handler(async ({ data: reviewId }) => {
+		const supabase = getSupabaseServerClient();
+
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			throw new Error("Vous devez être connecté pour supprimer un avis");
+		}
+
+		const { error } = await supabase
+			.from("reviews")
+			.delete()
+			.eq("id", reviewId)
+			.eq("user_id", user.id); // Ensure user can only delete their own review
+
+		if (error) {
+			console.error("Error deleting review:", error);
+			throw new Error("Erreur lors de la suppression de l'avis");
+		}
+
+		return { success: true };
+	});
+
+export const fetchUserReviewForRestaurant = createServerFn({ method: "GET" })
+	.inputValidator((restaurantId: string) => restaurantId)
+	.handler(async ({ data: restaurantId }) => {
+		const supabase = getSupabaseServerClient();
+
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			return null;
+		}
+
+		const { data: review } = await supabase
+			.from("reviews")
+			.select("*")
+			.eq("restaurant_id", restaurantId)
+			.eq("user_id", user.id)
+			.single();
+
+		return review as Review | null;
 	});
 
 export const fetchReviewsByRestaurantId = createServerFn({ method: "GET" })

@@ -1,8 +1,14 @@
-import { useMutation } from "@tanstack/react-query";
-import { useId, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Trash2 } from "lucide-react";
+import { useEffect, useId, useState } from "react";
 import { toast } from "react-toastify";
 import type { Restaurant } from "@/services/restaurants/restaurants.types";
-import { createReview } from "@/services/reviews/reviews.api";
+import {
+	createReview,
+	deleteReview,
+	fetchUserReviewForRestaurant,
+	updateReview,
+} from "@/services/reviews/reviews.api";
 
 interface ReviewFormProps {
 	restaurant: Restaurant;
@@ -10,17 +16,63 @@ interface ReviewFormProps {
 
 export function ReviewForm({ restaurant }: ReviewFormProps) {
 	const commentId = useId();
+	const queryClient = useQueryClient();
 	const [rating, setRating] = useState(0);
 	const [comment, setComment] = useState("");
 	const [hoveredRating, setHoveredRating] = useState(0);
+
+	// Fetch existing user review
+	const { data: existingReview, isLoading: isLoadingReview } = useQuery({
+		queryKey: ["user-review", restaurant.id],
+		queryFn: () => fetchUserReviewForRestaurant({ data: restaurant.id }),
+	});
+
+	// Pre-fill form if user has an existing review
+	useEffect(() => {
+		if (existingReview) {
+			setRating(existingReview.rating);
+			setComment(existingReview.comment || "");
+		}
+	}, [existingReview]);
+
+	const isEditing = !!existingReview;
+
+	const invalidateQueries = () => {
+		queryClient.invalidateQueries({ queryKey: ["user-review", restaurant.id] });
+		queryClient.invalidateQueries({
+			queryKey: ["restaurant-rating", restaurant.id],
+		});
+	};
 
 	const { mutate: submitReview, isPending: isSubmittingReview } = useMutation({
 		mutationFn: createReview,
 		onSuccess: () => {
 			toast.success("Avis envoyé avec succès !");
-			// Reset form
+			invalidateQueries();
+		},
+		onError: (error) => {
+			toast.error(error.message);
+		},
+	});
+
+	const { mutate: submitUpdate, isPending: isUpdatingReview } = useMutation({
+		mutationFn: updateReview,
+		onSuccess: () => {
+			toast.success("Avis modifié avec succès !");
+			invalidateQueries();
+		},
+		onError: (error) => {
+			toast.error(error.message);
+		},
+	});
+
+	const { mutate: submitDelete, isPending: isDeletingReview } = useMutation({
+		mutationFn: deleteReview,
+		onSuccess: () => {
+			toast.success("Avis supprimé avec succès !");
 			setRating(0);
 			setComment("");
+			invalidateQueries();
 		},
 		onError: (error) => {
 			toast.error(error.message);
@@ -34,24 +86,59 @@ export function ReviewForm({ restaurant }: ReviewFormProps) {
 			return;
 		}
 
-		submitReview({
-			data: {
-				restaurant_id: restaurant.id,
-				restaurant_name: restaurant.name,
-				rating,
-				comment,
-			},
-		});
+		if (isEditing && existingReview) {
+			submitUpdate({
+				data: {
+					reviewId: existingReview.id,
+					rating,
+					comment,
+				},
+			});
+		} else {
+			submitReview({
+				data: {
+					restaurant_id: restaurant.id,
+					restaurant_name: restaurant.name,
+					rating,
+					comment,
+				},
+			});
+		}
 	};
+
+	const handleDelete = () => {
+		if (
+			existingReview &&
+			confirm("Êtes-vous sûr de vouloir supprimer votre avis ?")
+		) {
+			submitDelete({ data: existingReview.id });
+		}
+	};
+
+	const isPending = isSubmittingReview || isUpdatingReview || isDeletingReview;
+
+	if (isLoadingReview) {
+		return (
+			<section className="mt-12 max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8 border-2 border-orange-100">
+				<div className="flex items-center justify-center py-8">
+					<div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+				</div>
+			</section>
+		);
+	}
 
 	return (
 		<section className="mt-12 max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8 border-2 border-orange-100">
 			<div className="text-center mb-8">
 				<h2 className="text-3xl font-bold text-gray-900 mb-2">
-					Noter {restaurant.name}
+					{isEditing
+						? `Modifier votre avis pour ${restaurant.name}`
+						: `Noter ${restaurant.name}`}
 				</h2>
 				<p className="text-gray-600">
-					Partagez votre expérience avec vos collègues
+					{isEditing
+						? "Mettez à jour votre expérience"
+						: "Partagez votre expérience avec vos collègues"}
 				</p>
 				{restaurant.address && (
 					<p className="text-sm text-gray-500 mt-1">{restaurant.address}</p>
@@ -117,14 +204,31 @@ export function ReviewForm({ restaurant }: ReviewFormProps) {
 					/>
 				</div>
 
-				{/* Submit Button */}
-				<button
-					type="submit"
-					disabled={isSubmittingReview || rating === 0}
-					className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold py-3 px-4 rounded-lg hover:from-red-700 hover:to-orange-700 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg hover:shadow-xl"
-				>
-					{isSubmittingReview ? "Envoi en cours..." : "Envoyer mon avis"}
-				</button>
+				{/* Buttons */}
+				<div className="flex gap-3">
+					<button
+						type="submit"
+						disabled={isPending || rating === 0}
+						className="flex-1 bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold py-3 px-4 rounded-lg hover:from-red-700 hover:to-orange-700 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg hover:shadow-xl"
+					>
+						{isPending
+							? "En cours..."
+							: isEditing
+								? "Modifier mon avis"
+								: "Envoyer mon avis"}
+					</button>
+					{isEditing && (
+						<button
+							type="button"
+							onClick={handleDelete}
+							disabled={isPending}
+							className="px-4 py-3 bg-red-100 text-red-700 font-medium rounded-lg hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+							title="Supprimer mon avis"
+						>
+							<Trash2 className="w-5 h-5" />
+						</button>
+					)}
+				</div>
 			</form>
 		</section>
 	);
