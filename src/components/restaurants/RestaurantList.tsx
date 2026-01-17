@@ -112,7 +112,7 @@ export function RestaurantList({ restaurants }: { restaurants: Restaurant[] }) {
 	return (
 		<section className="container mx-auto py-8 max-w-6xl">
 			<div className="flex items-center justify-between mb-4">
-				<h2 className="text-xl font-semibold text-gray-800">
+				<h2 className="text-xl font-semibold text-gray-800 ml-2">
 					Tous les restaurants ({restaurants.length})
 				</h2>
 			</div>

@@ -29,6 +29,13 @@ export function TopNavbar({ isAuthenticated, username }: TopNavbarProps) {
 
 			{/* Right side */}
 			<div className="flex items-center gap-4">
+				<Link
+					to="/offices"
+					className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+				>
+					Bureaux
+				</Link>
+
 				{isAuthenticated ? (
 					<>
 						{username && (

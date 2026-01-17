@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Building2, Plus, X } from "lucide-react";
-import { useState } from "react";
+import { Building2, Plus, Search, X } from "lucide-react";
+import { useMemo, useState } from "react";
 import OfficesCard from "@/components/OfficesCard";
 import { CreateOfficeForm } from "@/components/offices/CreateOfficeForm";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { fetchOffices } from "@/services/offices/offices.api";
 
 export const Route = createFileRoute("/offices/")({
@@ -15,8 +16,23 @@ function RouteComponent() {
 	const offices = Route.useLoaderData();
 	const { authState } = Route.useRouteContext();
 	const [showCreateForm, setShowCreateForm] = useState(false);
+	const [searchQuery, setSearchQuery] = useState("");
 
 	const isAuthenticated = authState?.isAuthenticated;
+
+	// Filtrer les bureaux par nom ou ville
+	const filteredOffices = useMemo(() => {
+		if (!offices) return [];
+		if (!searchQuery.trim()) return offices;
+
+		const query = searchQuery.toLowerCase().trim();
+		return offices.filter(
+			(office) =>
+				office.name.toLowerCase().includes(query) ||
+				office.city?.toLowerCase().includes(query) ||
+				office.street?.toLowerCase().includes(query),
+		);
+	}, [offices, searchQuery]);
 
 	return (
 		<section className="min-h-screen bg-background py-16">
@@ -32,12 +48,23 @@ function RouteComponent() {
 					{/* Title & Description */}
 					<div className="space-y-6">
 						<h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-							Nos Bureaux
+							Bureaux / Entreprises
 						</h1>
 						<p className="text-xl text-muted-foreground max-w-xl mx-auto leading-relaxed">
-							Découvrez nos bureaux et trouvez le restaurant parfait pour votre
-							pause déjeuner.
+							Trouvez le restaurant parfait pour votre pause déjeuner.
 						</p>
+					</div>
+
+					{/* Search Input */}
+					<div className="relative max-w-md mx-auto">
+						<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+						<Input
+							type="text"
+							placeholder="Rechercher un bureau par nom ou ville..."
+							value={searchQuery}
+							onChange={(e) => setSearchQuery(e.target.value)}
+							className="pl-10 h-12"
+						/>
 					</div>
 
 					{/* Create Office Button */}
@@ -71,14 +98,22 @@ function RouteComponent() {
 					</div>
 				)}
 
+				{/* Search Results Info */}
+				{searchQuery.trim() && (
+					<div className="text-center mb-6 text-muted-foreground">
+						{filteredOffices.length} résultat
+						{filteredOffices.length !== 1 ? "s" : ""} pour "{searchQuery}"
+					</div>
+				)}
+
 				{/* Offices Grid */}
 				<section className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-					{offices?.map((office) => (
+					{filteredOffices.map((office) => (
 						<OfficesCard key={office.id} office={office} />
 					))}
 				</section>
 
-				{/* Empty State */}
+				{/* Empty State - No offices at all */}
 				{offices?.length === 0 && (
 					<div className="text-center mt-16 space-y-4">
 						<div className="text-6xl">🏢</div>
@@ -99,6 +134,29 @@ function RouteComponent() {
 						)}
 					</div>
 				)}
+
+				{/* Empty State - No search results */}
+				{offices &&
+					offices.length > 0 &&
+					filteredOffices.length === 0 &&
+					searchQuery.trim() && (
+						<div className="text-center mt-16 space-y-4">
+							<div className="text-6xl">🔍</div>
+							<h3 className="text-2xl font-bold text-foreground">
+								Aucun résultat
+							</h3>
+							<p className="text-muted-foreground">
+								Aucun bureau ne correspond à votre recherche "{searchQuery}".
+							</p>
+							<Button
+								variant="outline"
+								onClick={() => setSearchQuery("")}
+								className="mt-4"
+							>
+								Effacer la recherche
+							</Button>
+						</div>
+					)}
 			</div>
 		</section>
 	);
