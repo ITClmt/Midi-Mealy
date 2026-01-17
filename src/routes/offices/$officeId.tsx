@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, useMatches } from "@tanstack/react-router";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { OfficeHero } from "@/components/offices/OfficeHero";
+import { OfficeManagement } from "@/components/offices/OfficeManagement";
 import ReviewSection from "@/components/reviews/ReviewSection";
 import { useOfficeRestaurants } from "@/hooks/useOfficeRestaurants";
 import { fetchOfficeById } from "@/services/offices/offices.api";
@@ -23,6 +24,10 @@ function OfficeLayoutComponent() {
 		office,
 		officeId,
 	);
+
+	// Vérifier si l'utilisateur connecté est le manager du bureau
+	const isManager =
+		authState?.isAuthenticated && authState?.user?.id === office?.manager_id;
 
 	// Vérifier si on est sur une route enfant (search, map)
 	const isChildRoute = matches.some(
@@ -69,6 +74,9 @@ function OfficeLayoutComponent() {
 					officeName={office.name}
 					restaurantsLength={restaurants.length}
 				/>
+				<div className="px-6 py-4">
+					<OfficeManagement office={office} isManager={isManager} />
+				</div>
 				<ReviewSection office={office} restaurants={restaurants} />
 			</main>
 		</div>

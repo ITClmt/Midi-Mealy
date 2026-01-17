@@ -1,7 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getSupabaseServerClient } from "@/lib/db/supabase";
 import { cleanExpiredCache } from "@/scripts/clean-cache";
-import type { OSMElement, OSMResponse, Restaurant } from "./offices.types";
+import type {
+	CreateOfficeInput,
+	OSMElement,
+	OSMResponse,
+	Restaurant,
+} from "./offices.types";
 
 export const fetchOffices = createServerFn({ method: "GET" }).handler(
 	async () => {
@@ -15,6 +20,163 @@ export const fetchOffices = createServerFn({ method: "GET" }).handler(
 		return data;
 	},
 );
+
+/**
+ * Géocode une adresse via l'API Nominatim (OpenStreetMap)
+ * @param address - L'adresse complète à géocoder
+ * @returns Les coordonnées lat/lng
+ */
+export const geocodeAddress = createServerFn({ method: "GET" })
+	.inputValidator((address: string) => address)
+	.handler(async ({ data: address }) => {
+		const response = await fetch(
+			`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`,
+			{
+				headers: {
+					"User-Agent": "Midi-Mealy/1.0",
+				},
+			},
+		);
+
+		if (!response.ok) {
+			throw new Error("Erreur lors du géocodage de l'adresse");
+		}
+
+		const results = await response.json();
+
+		if (!results || results.length === 0) {
+			throw new Error(
+				"Adresse non trouvée. Veuillez vérifier l'adresse saisie.",
+			);
+		}
+
+		return {
+			lat: parseFloat(results[0].lat),
+			lng: parseFloat(results[0].lon),
+		};
+	});
+
+/**
+ * Crée un nouveau bureau avec géocodage automatique de l'adresse
+ * @param data - Les informations du bureau (nom, adresse, etc.)
+ * @returns Le bureau créé
+ */
+export const createOffice = createServerFn({ method: "POST" })
+	.inputValidator((data: CreateOfficeInput) => data)
+	.handler(async ({ data }) => {
+		const supabase = getSupabaseServerClient();
+
+		// Vérifier l'authentification
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+		if (!user) {
+			throw new Error("Vous devez être connecté pour créer un bureau");
+		}
+
+		// Géocoder l'adresse complète
+		const fullAddress = `${data.street}, ${data.zip_code} ${data.city}, ${data.country}`;
+		const coords = await geocodeAddress({ data: fullAddress });
+
+		// Créer le bureau
+		const { data: office, error } = await supabase
+			.from("offices")
+			.insert({
+				name: data.name,
+				street: data.street,
+				city: data.city,
+				zip_code: data.zip_code,
+				country: data.country,
+				logo_url:
+					data.logo_url ||
+					"https://cdn-icons-png.freepik.com/512/18214/18214645.png?ga=GA1.1.347094884.1761166313",
+				lat: coords.lat,
+				lng: coords.lng,
+				manager_id: user.id,
+			})
+			.select()
+			.single();
+
+		if (error) {
+			throw new Error(`Erreur lors de la création du bureau: ${error.message}`);
+		}
+
+		return office;
+	});
+
+/**
+ * Met à jour un bureau existant (manager uniquement)
+ * @param data - L'ID du bureau et les champs à mettre à jour
+ * @returns Le bureau mis à jour
+ */
+export const updateOffice = createServerFn({ method: "POST" })
+	.inputValidator(
+		(data: { id: number; updates: Partial<CreateOfficeInput> }) => data,
+	)
+	.handler(async ({ data }) => {
+		const supabase = getSupabaseServerClient();
+
+		const { data: office, error } = await supabase
+			.from("offices")
+			.update(data.updates)
+			.eq("id", data.id)
+			.select()
+			.single();
+
+		if (error) {
+			throw new Error(`Erreur lors de la mise à jour: ${error.message}`);
+		}
+
+		return office;
+	});
+
+/**
+ * Supprime un bureau avec vérification du mot de passe (manager uniquement)
+ * @param data - L'ID du bureau et le mot de passe de l'utilisateur
+ */
+export const deleteOffice = createServerFn({ method: "POST" })
+	.inputValidator((data: { id: number; password: string }) => data)
+	.handler(async ({ data }) => {
+		const supabase = getSupabaseServerClient();
+
+		// Récupérer l'utilisateur connecté
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+		if (!user || !user.email) {
+			throw new Error("Vous devez être connecté pour supprimer un bureau");
+		}
+
+		// Vérifier le mot de passe en tentant une ré-authentification
+		const { error: authError } = await supabase.auth.signInWithPassword({
+			email: user.email,
+			password: data.password,
+		});
+
+		if (authError) {
+			throw new Error("Mot de passe incorrect");
+		}
+
+		// Vérifier que l'utilisateur est bien le manager du bureau
+		const { data: office } = await supabase
+			.from("offices")
+			.select("manager_id")
+			.eq("id", data.id)
+			.single();
+
+		if (!office || office.manager_id !== user.id) {
+			throw new Error("Vous n'êtes pas autorisé à supprimer ce bureau");
+		}
+
+		// Supprimer le bureau
+		const { error } = await supabase.from("offices").delete().eq("id", data.id);
+
+		if (error) {
+			throw new Error(`Erreur lors de la suppression: ${error.message}`);
+		}
+
+		return { success: true };
+	});
 
 export const fetchOfficeById = createServerFn({ method: "GET" })
 	.inputValidator((id: number) => id)

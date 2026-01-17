@@ -8,6 +8,16 @@ export interface Office {
 	logo_url: string;
 	lat: number;
 	lng: number;
+	manager_id?: string;
+}
+
+export interface CreateOfficeInput {
+	name: string;
+	street: string;
+	city: string;
+	zip_code: string;
+	country: string;
+	logo_url?: string;
 }
 
 export interface OfficesCardProps {

@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS offices (
   logo_url TEXT DEFAULT 'https://cdn-icons-png.freepik.com/512/18214/18214645.png?ga=GA1.1.347094884.1761166313',
   lat DOUBLE PRECISION NOT NULL,
   lng DOUBLE PRECISION NOT NULL,
+  manager_id UUID REFERENCES auth.users(id),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -123,18 +124,20 @@ CREATE POLICY "Enable read access for all users"
 ON offices FOR SELECT
 USING (true);
 
--- Politiques RLS pour offices (écriture pour utilisateurs authentifiés)
+-- Politiques RLS pour offices (création pour utilisateurs authentifiés)
 CREATE POLICY "Enable insert for authenticated users only"
 ON offices FOR INSERT
 WITH CHECK (auth.role() = 'authenticated');
 
-CREATE POLICY "Enable update for authenticated users only"
+-- Politiques RLS pour offices (modification par le manager uniquement)
+CREATE POLICY "Enable update for office manager only"
 ON offices FOR UPDATE
-USING (auth.role() = 'authenticated');
+USING (auth.uid() = manager_id);
 
-CREATE POLICY "Enable delete for authenticated users only"
+-- Politiques RLS pour offices (suppression par le manager uniquement)
+CREATE POLICY "Enable delete for office manager only"
 ON offices FOR DELETE
-USING (auth.role() = 'authenticated');
+USING (auth.uid() = manager_id);
 
 -- Politiques RLS pour osm_restaurants_cache (accès public pour cache)
 -- Permet les opérations serveur sans authentification
