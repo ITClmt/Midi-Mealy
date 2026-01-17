@@ -10,6 +10,7 @@ import {
 	PaginationNext,
 	PaginationPrevious,
 } from "@/components/ui/pagination";
+import { normalizeText } from "@/lib/utils";
 import type { Restaurant } from "@/services/restaurants/restaurants.types";
 
 const RESTAURANTS_PER_PAGE = 10;
@@ -21,14 +22,16 @@ export function RestaurantList({ restaurants }: { restaurants: Restaurant[] }) {
 		string | undefined
 	>(undefined);
 
-	// Filter restaurants based on search
+	// Filter restaurants based on search (accent-insensitive)
 	const filteredRestaurants = search
-		? restaurants.filter(
-				(restaurant) =>
-					restaurant.name.toLowerCase().includes(search.toLowerCase()) ||
-					restaurant.address?.toLowerCase().includes(search.toLowerCase()) ||
-					restaurant.cuisine?.toLowerCase().includes(search.toLowerCase()),
-			)
+		? restaurants.filter((restaurant) => {
+				const normalizedSearch = normalizeText(search);
+				return (
+					normalizeText(restaurant.name).includes(normalizedSearch) ||
+					normalizeText(restaurant.address || "").includes(normalizedSearch) ||
+					normalizeText(restaurant.cuisine || "").includes(normalizedSearch)
+				);
+			})
 		: restaurants;
 
 	// Sort restaurants by rating (highest to lowest)

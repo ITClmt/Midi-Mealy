@@ -5,6 +5,7 @@ import OfficesCard from "@/components/OfficesCard";
 import { CreateOfficeForm } from "@/components/offices/CreateOfficeForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { normalizeText } from "@/lib/utils";
 import { fetchOffices } from "@/services/offices/offices.api";
 
 export const Route = createFileRoute("/offices/")({
@@ -20,17 +21,17 @@ function RouteComponent() {
 
 	const isAuthenticated = authState?.isAuthenticated;
 
-	// Filtrer les bureaux par nom ou ville
+	// Filtrer les bureaux par nom ou ville (insensible aux accents)
 	const filteredOffices = useMemo(() => {
 		if (!offices) return [];
 		if (!searchQuery.trim()) return offices;
 
-		const query = searchQuery.toLowerCase().trim();
+		const normalizedQuery = normalizeText(searchQuery);
 		return offices.filter(
 			(office) =>
-				office.name.toLowerCase().includes(query) ||
-				office.city?.toLowerCase().includes(query) ||
-				office.street?.toLowerCase().includes(query),
+				normalizeText(office.name).includes(normalizedQuery) ||
+				normalizeText(office.city || "").includes(normalizedQuery) ||
+				normalizeText(office.street || "").includes(normalizedQuery),
 		);
 	}, [offices, searchQuery]);
 
