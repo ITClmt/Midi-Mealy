@@ -175,6 +175,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					<TopNavbar
 						isAuthenticated={authState?.isAuthenticated}
 						username={authState?.user?.meta?.username || authState?.user?.email}
+						userId={authState?.user?.id}
 					/>
 					<main className="flex-1 overflow-auto">{children}</main>
 				</div>

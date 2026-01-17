@@ -5,9 +5,14 @@ import { signOut } from "@/services/auth/auth.api";
 interface TopNavbarProps {
 	isAuthenticated?: boolean;
 	username?: string;
+	userId?: string;
 }
 
-export function TopNavbar({ isAuthenticated, username }: TopNavbarProps) {
+export function TopNavbar({
+	isAuthenticated,
+	username,
+	userId,
+}: TopNavbarProps) {
 	const navigate = useNavigate();
 
 	const handleLogout = async () => {
@@ -39,9 +44,13 @@ export function TopNavbar({ isAuthenticated, username }: TopNavbarProps) {
 				{isAuthenticated ? (
 					<>
 						{username && (
-							<span className="text-sm text-muted-foreground hidden sm:block">
+							<Link
+								to="/profile/$userId"
+								params={{ userId: userId || "" }}
+								className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+							>
 								{username}
-							</span>
+							</Link>
 						)}
 						<button
 							type="button"

@@ -69,7 +69,26 @@ export const getUser = createServerFn().handler(async () => {
 		user: {
 			email: data.user.email,
 			meta: { username: data.user.user_metadata.name },
-			id: data.user.user_metadata.sub,
+			id: data.user.id,
 		},
 	};
 });
+
+/**
+ * Met à jour le nom d'utilisateur
+ */
+export const updateUsername = createServerFn({ method: "POST" })
+	.inputValidator((data: { username: string }) => data)
+	.handler(async ({ data }) => {
+		const supabase = getSupabaseServerClient();
+
+		const { error } = await supabase.auth.updateUser({
+			data: { name: data.username },
+		});
+
+		if (error) {
+			throw new Error(`Erreur lors de la mise à jour: ${error.message}`);
+		}
+
+		return { success: true, username: data.username };
+	});
