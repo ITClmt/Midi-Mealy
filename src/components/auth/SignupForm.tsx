@@ -26,11 +26,15 @@ export function SignUpForm({
 
 	const signUpMutation = useMutation({
 		mutationFn: (data: Parameters<typeof signUp>[0]) => signUp(data),
-		onSuccess: () => {
-			console.log("signed up successfully");
+		onSuccess: async (response) => {
+			if (response?.error) {
+				console.error(response.message);
+				return;
+			}
 
-			queryClient.resetQueries();
-			router.invalidate();
+			await queryClient.invalidateQueries();
+			await router.invalidate();
+			router.navigate({ to: "/offices" });
 		},
 	});
 

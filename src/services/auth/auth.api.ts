@@ -10,6 +10,11 @@ export const signUp = createServerFn()
 		const { error, data: userData } = await supabase.auth.signUp({
 			email: data.email,
 			password: data.password,
+			options: {
+				data: {
+					name: data.fullName,
+				},
+			},
 		});
 
 		if (error) {
