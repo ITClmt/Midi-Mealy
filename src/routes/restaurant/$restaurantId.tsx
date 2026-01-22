@@ -175,6 +175,10 @@ function RouteComponent() {
 										className="bg-card border border-border rounded-xl p-4"
 									>
 										<div className="flex items-center gap-2 mb-2">
+											<span className="font-medium text-foreground">
+												{review.username || "Utilisateur"}
+											</span>
+											<span className="text-muted-foreground">•</span>
 											<div className="flex gap-0.5">
 												{[1, 2, 3, 4, 5].map((star) => (
 													<Star
@@ -187,6 +191,7 @@ function RouteComponent() {
 													/>
 												))}
 											</div>
+											<span className="text-muted-foreground">•</span>
 											<span className="text-sm text-muted-foreground">
 												{new Date(review.created_at).toLocaleDateString(
 													"fr-FR",

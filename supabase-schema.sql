@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS reviews (
   rating integer not null check (rating >= 1 and rating <= 5),
   comment text null,
   user_id uuid default auth.uid(), -- Links to the authenticated user
+  username text null, -- Username of the reviewer
   constraint reviews_pkey primary key (id)
 );
 

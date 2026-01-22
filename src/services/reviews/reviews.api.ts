@@ -30,6 +30,9 @@ export const createReview = createServerFn({ method: "POST" })
 			);
 		}
 
+		const username =
+			user.user_metadata?.name || user.email?.split("@")[0] || "Anonyme";
+
 		const { data: review, error } = await supabase
 			.from("reviews")
 			.insert({
@@ -38,6 +41,7 @@ export const createReview = createServerFn({ method: "POST" })
 				rating: data.rating,
 				comment: data.comment,
 				user_id: user.id,
+				username: username,
 			})
 			.select()
 			.single();

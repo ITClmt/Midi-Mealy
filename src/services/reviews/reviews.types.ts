@@ -6,6 +6,7 @@ export interface Review {
 	rating: number;
 	comment?: string;
 	user_id?: string;
+	username?: string;
 }
 
 export interface CreateReviewDTO {
