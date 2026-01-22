@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
+import { AlertCircle } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -23,18 +25,41 @@ export function SignUpForm({
 }: SignUpFormProps) {
 	const queryClient = useQueryClient();
 	const router = useRouter();
+	const [formError, setFormError] = useState<string | null>(null);
+
+	// Parse error message from various formats (string, Zod errors array, etc.)
+	const parseErrorMessage = (message: string | undefined): string => {
+		if (!message) return "Une erreur est survenue";
+
+		// Try to parse as JSON (Zod validation errors come as JSON array)
+		try {
+			const parsed = JSON.parse(message);
+			if (Array.isArray(parsed) && parsed.length > 0) {
+				// Extract first error message from Zod errors
+				return parsed[0]?.message || message;
+			}
+		} catch {
+			// Not JSON, return as-is
+		}
+
+		return message;
+	};
 
 	const signUpMutation = useMutation({
 		mutationFn: (data: Parameters<typeof signUp>[0]) => signUp(data),
 		onSuccess: async (response) => {
 			if (response?.error) {
-				console.error(response.message);
+				setFormError(parseErrorMessage(response.message));
 				return;
 			}
 
+			setFormError(null);
 			await queryClient.invalidateQueries();
 			await router.invalidate();
 			router.navigate({ to: "/offices" });
+		},
+		onError: (error) => {
+			setFormError(parseErrorMessage(error.message));
 		},
 	});
 
@@ -46,6 +71,7 @@ export function SignUpForm({
 			confirmPassword: "",
 		} as SignUpSchema,
 		onSubmit: async ({ value }) => {
+			setFormError(null);
 			await signUpMutation.mutateAsync({ data: value });
 		},
 	});
@@ -69,6 +95,13 @@ export function SignUpForm({
 							}}
 							className="space-y-4"
 						>
+							{formError && (
+								<div className="flex items-center gap-2 p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg">
+									<AlertCircle className="w-4 h-4 shrink-0" />
+									<span>{formError}</span>
+								</div>
+							)}
+
 							<form.AppField name="fullName">
 								{(field) => (
 									<field.TextField label="Nom complet" placeholder="John Doe" />

@@ -6,14 +6,14 @@ export const SignUpSchema = z
 		email: z.string().email("L'email est invalide"),
 		password: z
 			.string()
-			.min(8)
+			.min(8, "Le mot de passe doit contenir au moins 8 caractères")
 			.regex(
 				/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
 				"Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre",
 			),
 		confirmPassword: z
 			.string()
-			.min(8)
+			.min(8, "Le mot de passe doit contenir au moins 8 caractères")
 			.regex(
 				/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
 				"Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre",
@@ -25,8 +25,10 @@ export const SignUpSchema = z
 	});
 
 export const LoginSchema = z.object({
-	email: z.string().email(),
-	password: z.string().min(8),
+	email: z.string().email("L'email est invalide"),
+	password: z
+		.string()
+		.min(8, "Le mot de passe doit contenir au moins 8 caractères"),
 });
 
 export const UserMetaSchema = z.object({
