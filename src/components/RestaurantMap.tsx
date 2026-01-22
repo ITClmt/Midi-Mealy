@@ -47,28 +47,28 @@ export const RestaurantMap = ({
 				'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles courtesy of <a href="https://www.openstreetmap.cat" target="_blank">Breton OpenStreetMap Team</a>',
 		}).addTo(map);
 
-		// Créer une icône personnalisée pour l'office
 		const officeIcon = L.divIcon({
 			html: `
 				<div class="relative">
-					<div class="w-12 h-12 bg-white rounded-full border-4 border-red-600 shadow-lg flex items-center justify-center">
+					<div class="absolute -inset-1 bg-indigo-400 rounded-xl opacity-40 animate-pulse"></div>
+					<div class="relative w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-xl flex items-center justify-center border-2 border-white">
 						<img 
 							src="${officeLogoUrl}" 
 							alt="Office" 
-							class="w-8 h-8 rounded-full object-cover"
+							class="w-9 h-9 rounded-lg object-cover"
 							onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"
 						/>
-						<div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white text-xs font-bold" style="display: none;">
+						<div class="w-9 h-9 rounded-lg flex items-center justify-center text-white text-lg" style="display: none;">
 							🏢
 						</div>
 					</div>
-					<div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-red-600"></div>
+					<div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[8px] border-r-[8px] border-t-[10px] border-transparent border-t-purple-600"></div>
 				</div>
 			`,
 			className: "custom-office-marker",
-			iconSize: [48, 48],
-			iconAnchor: [24, 48],
-			popupAnchor: [0, -48],
+			iconSize: [56, 56],
+			iconAnchor: [28, 56],
+			popupAnchor: [0, -56],
 		});
 
 		// Icône simple avec libellé pour les restaurants
@@ -91,12 +91,17 @@ export const RestaurantMap = ({
 		restaurants.forEach((restaurant) => {
 			const labelIcon = L.divIcon({
 				html: `
-					<div class="w-6 h-6 bg-red-600 rounded-full border-2 border-white shadow-md"></div>
+					<div class="relative group">
+						<div class="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110">
+							<span class="text-white text-sm">🍽️</span>
+						</div>
+						<div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[5px] border-r-[5px] border-t-[6px] border-transparent border-t-orange-500"></div>
+					</div>
 				`,
 				className: "custom-restaurant-label",
-				iconSize: [0, 0],
-				iconAnchor: [0, 0],
-				popupAnchor: [0, -10],
+				iconSize: [32, 40],
+				iconAnchor: [16, 40],
+				popupAnchor: [0, -40],
 			});
 
 			const marker = L.marker([restaurant.latitude, restaurant.longitude], {
@@ -111,7 +116,7 @@ export const RestaurantMap = ({
 				: `${restaurant.latitude},${restaurant.longitude}`;
 
 			const popupContent = `
-        <div class="p-3 min-w-[200px] max-w-[240px] flex flex-col gap-2 bg-white rounded-lg">
+        <div class="p-3 min-w-[220px] max-w-[260px] flex flex-col gap-3 bg-white rounded-lg">
           <a 
             href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(googleMapsQuery)}"
             target="_blank" 
@@ -120,14 +125,21 @@ export const RestaurantMap = ({
             aria-label="Voir ${restaurant.name} sur Google Maps"
             tabindex="0"
           >
-            <h3 class="font-semibold text-sm text-blue-900 leading-tight truncate">${restaurant.name}</h3>
-         <span class="text-xs text-gray-600 leading-tight hover:text-blue-900 transition-colors">${restaurant?.address}</span>
+            <h3 class="font-semibold text-sm text-gray-900 leading-tight">${restaurant.name}</h3>
+            <span class="text-xs text-gray-500 leading-tight">${restaurant?.address || "Adresse non disponible"}</span>
           </a>
         
           <div class="flex items-center gap-2 flex-wrap">
-            ${restaurant.cuisine ? `<span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-900 text-xs leading-tight font-medium">🍽️ ${restaurant.cuisine}</span>` : ""}
-            ${restaurant.rating ? `<span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-900 text-xs leading-tight font-medium">⭐ ${restaurant.rating}/5</span>` : ""}
+            ${restaurant.cuisine ? `<span class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-xs font-medium">🍽️ ${restaurant.cuisine}</span>` : ""}
+            ${restaurant.rating ? `<span class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-xs font-medium">⭐ ${restaurant.rating.toFixed(1)}</span>` : ""}
           </div>
+
+          <a 
+            href="/restaurant/${restaurant.id}"
+            class="mt-1 w-full text-center py-2 px-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-medium rounded-lg hover:from-amber-500 hover:to-orange-600 transition-all shadow-sm"
+          >
+            ✍️ Voir / laisser un avis
+          </a>
 		</div>`;
 
 			marker.bindPopup(popupContent);
