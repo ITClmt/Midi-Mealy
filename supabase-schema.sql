@@ -1,18 +1,6 @@
--- Schéma initial pour Midi-Mealy sur Supabase
+-- Schéma pour Midi-Mealy sur Supabase
 -- Exécutez ce script dans le SQL Editor de Supabase
 
--- Table des restaurants
-CREATE TABLE IF NOT EXISTS restaurants (
-  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  name TEXT NOT NULL,
-  address TEXT,
-  logo_url TEXT DEFAULT 'https://www.pngall.com/wp-content/uploads/8/Restaurant-PNG-HD-Image.png',
-  lat DOUBLE PRECISION NOT NULL,
-  lng DOUBLE PRECISION NOT NULL,
-  avg_rating DOUBLE PRECISION DEFAULT 0,
-  ratings_count INTEGER DEFAULT 0,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
 
 -- Table des avis/reviews
 CREATE TABLE IF NOT EXISTS reviews (
@@ -98,51 +86,30 @@ VALUES (
 
 -- Index pour optimiser les requêtes
 CREATE INDEX IF NOT EXISTS idx_reviews_restaurant_id ON reviews(restaurant_id);
-CREATE INDEX IF NOT EXISTS idx_restaurants_location ON restaurants(lat, lng);
 CREATE INDEX IF NOT EXISTS idx_osm_cache_key ON osm_restaurants_cache(cache_key);
 CREATE INDEX IF NOT EXISTS idx_osm_cache_expires ON osm_restaurants_cache(expires_at);
 
 -- Activer Row Level Security (RLS)
-ALTER TABLE restaurants ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE offices ENABLE ROW LEVEL SECURITY;
 ALTER TABLE osm_restaurants_cache ENABLE ROW LEVEL SECURITY;
 
--- Politiques RLS pour restaurants (lecture publique)
-CREATE POLICY "Enable read access for all users"
-ON restaurants FOR SELECT
-USING (true);
-
--- Politiques RLS pour restaurants (écriture pour utilisateurs authentifiés)
-CREATE POLICY "Enable insert for authenticated users only"
-ON restaurants FOR INSERT
-WITH CHECK (auth.role() = 'authenticated');
-
-CREATE POLICY "Enable update for authenticated users only"
-ON restaurants FOR UPDATE
-USING (auth.role() = 'authenticated');
-
-CREATE POLICY "Enable delete for authenticated users only"
-ON restaurants FOR DELETE
-USING (auth.role() = 'authenticated');
-
--- Politiques RLS pour reviews (lecture publique)
-CREATE POLICY "Enable read access for all users"
+-- Politiques RLS pour reviews
+CREATE POLICY "reviews_select_policy"
 ON reviews FOR SELECT
 USING (true);
 
--- Politiques RLS pour reviews (écriture pour utilisateurs authentifiés)
-CREATE POLICY "Enable insert for authenticated users only"
+CREATE POLICY "reviews_insert_policy"
 ON reviews FOR INSERT
 WITH CHECK (auth.role() = 'authenticated');
 
-CREATE POLICY "Enable update for authenticated users only"
+CREATE POLICY "reviews_update_policy"
 ON reviews FOR UPDATE
-USING (auth.role() = 'authenticated');
+USING (auth.uid() = user_id);
 
-CREATE POLICY "Enable delete for authenticated users only"
+CREATE POLICY "reviews_delete_policy"
 ON reviews FOR DELETE
-USING (auth.role() = 'authenticated');
+USING (auth.uid() = user_id);
 
 -- Politiques RLS pour offices (lecture publique)
 CREATE POLICY "Enable read access for all users"
@@ -183,23 +150,7 @@ CREATE POLICY "Enable delete for all users"
 ON osm_restaurants_cache FOR DELETE
 USING (true);
 
--- Enable Row Level Security
-alter table public.reviews enable row level security;
--- Allow everyone to read reviews
-create policy "Enable read access for all users"
-on public.reviews for select
-using (true);
--- Allow authenticated users to insert reviews
-create policy "Enable insert for authenticated users only"
-on public.reviews for insert
-with check (auth.role() = 'authenticated');
--- Optional: Allow users to update/delete their own reviews
-create policy "Enable update for users based on user_id"
-on public.reviews for update
-using (auth.uid() = user_id);
-create policy "Enable delete for users based on user_id"
-on public.reviews for delete
-using (auth.uid() = user_id);
+
 
 -- Politiques RLS pour office_members
 ALTER TABLE office_members ENABLE ROW LEVEL SECURITY;
