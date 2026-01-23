@@ -39,6 +39,30 @@ CREATE TABLE IF NOT EXISTS offices (
   lat DOUBLE PRECISION NOT NULL,
   lng DOUBLE PRECISION NOT NULL,
   manager_id UUID REFERENCES auth.users(id),
+  join_policy TEXT NOT NULL DEFAULT 'open' CHECK (join_policy IN ('open', 'code_required')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Table des membres d'un office
+CREATE TABLE IF NOT EXISTS office_members (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  office_id BIGINT NOT NULL REFERENCES offices(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('manager', 'moderator', 'member')),
+  joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(office_id, user_id)
+);
+
+-- Table des codes d'invitation
+CREATE TABLE IF NOT EXISTS office_invite_codes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  office_id BIGINT NOT NULL REFERENCES offices(id) ON DELETE CASCADE,
+  code TEXT NOT NULL UNIQUE,
+  created_by UUID NOT NULL REFERENCES auth.users(id),
+  expires_at TIMESTAMPTZ NOT NULL,
+  max_uses INTEGER DEFAULT NULL, -- NULL = utilisations illimitées
+  uses_count INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -176,3 +200,104 @@ using (auth.uid() = user_id);
 create policy "Enable delete for users based on user_id"
 on public.reviews for delete
 using (auth.uid() = user_id);
+
+-- Politiques RLS pour office_members
+ALTER TABLE office_members ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Enable read access for all users"
+ON office_members FOR SELECT
+USING (true);
+
+CREATE POLICY "Enable insert for authenticated users"
+ON office_members FOR INSERT
+WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "Enable update for managers and moderators"
+ON office_members FOR UPDATE
+USING (
+  EXISTS (
+    SELECT 1 FROM office_members om 
+    WHERE om.office_id = office_members.office_id 
+    AND om.user_id = auth.uid() 
+    AND om.role IN ('manager', 'moderator')
+  )
+);
+
+CREATE POLICY "Enable delete for managers and self"
+ON office_members FOR DELETE
+USING (
+  user_id = auth.uid() OR
+  EXISTS (
+    SELECT 1 FROM office_members om 
+    WHERE om.office_id = office_members.office_id 
+    AND om.user_id = auth.uid() 
+    AND om.role = 'manager'
+  )
+);
+
+-- Politiques RLS pour office_invite_codes
+ALTER TABLE office_invite_codes ENABLE ROW LEVEL SECURITY;
+
+-- Lecture : tout le monde peut lire (pour valider un code)
+CREATE POLICY "Enable read access for all users"
+ON office_invite_codes FOR SELECT
+USING (true);
+
+-- Création : managers et modérateurs uniquement
+CREATE POLICY "Enable insert for managers and moderators"
+ON office_invite_codes FOR INSERT
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM office_members om 
+    WHERE om.office_id = office_invite_codes.office_id 
+    AND om.user_id = auth.uid() 
+    AND om.role IN ('manager', 'moderator')
+  )
+  OR
+  EXISTS (
+    SELECT 1 FROM offices o
+    WHERE o.id = office_invite_codes.office_id
+    AND o.manager_id = auth.uid()
+  )
+);
+
+-- Mise à jour : managers, modérateurs, et mise à jour du uses_count par tout le monde
+CREATE POLICY "Enable update for managers and code usage"
+ON office_invite_codes FOR UPDATE
+USING (
+  EXISTS (
+    SELECT 1 FROM office_members om 
+    WHERE om.office_id = office_invite_codes.office_id 
+    AND om.user_id = auth.uid() 
+    AND om.role IN ('manager', 'moderator')
+  )
+  OR
+  EXISTS (
+    SELECT 1 FROM offices o
+    WHERE o.id = office_invite_codes.office_id
+    AND o.manager_id = auth.uid()
+  )
+  OR auth.role() = 'authenticated' -- Pour incrémenter uses_count
+);
+
+-- Suppression : managers uniquement
+CREATE POLICY "Enable delete for managers"
+ON office_invite_codes FOR DELETE
+USING (
+  EXISTS (
+    SELECT 1 FROM office_members om 
+    WHERE om.office_id = office_invite_codes.office_id 
+    AND om.user_id = auth.uid() 
+    AND om.role = 'manager'
+  )
+  OR
+  EXISTS (
+    SELECT 1 FROM offices o
+    WHERE o.id = office_invite_codes.office_id
+    AND o.manager_id = auth.uid()
+  )
+);
+
+-- Index pour optimiser les recherches de codes
+CREATE INDEX IF NOT EXISTS idx_invite_codes_code ON office_invite_codes(code);
+CREATE INDEX IF NOT EXISTS idx_invite_codes_office ON office_invite_codes(office_id);
