@@ -38,6 +38,24 @@ export const generateInviteCode = createServerFn({ method: "POST" })
 				};
 			}
 
+			const { data: officeMember } = await supabase
+				.from("office_members")
+				.select("*")
+				.eq("user_id", userData.user.id)
+				.eq("office_id", data.office_id)
+				.single();
+
+			if (
+				officeMember?.role !== "manager" ||
+				officeMember?.role !== "moderator"
+			) {
+				return {
+					success: false,
+					error:
+						"Vous devez être manager ou modérateur de l'office pour générer un code d'invitation",
+				};
+			}
+
 			// Générer un code unique de 8 caractères
 			const generateUniqueCode = (): string => {
 				const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // Exclus I, O, 0, 1 pour éviter confusion
@@ -301,12 +319,6 @@ export const useInviteCode = createServerFn({ method: "POST" })
 				};
 			}
 
-			// Incrémenter le compteur d'utilisations du code
-			await supabase.rpc("increment_invite_code_uses", {
-				code_value: data.code.toUpperCase().trim(),
-			});
-
-			// Alternative si la fonction RPC n'existe pas : mise à jour directe
 			// Récupérer le code actuel et incrémenter
 			const { data: codeData } = await supabase
 				.from("office_invite_codes")
@@ -342,6 +354,34 @@ export const deleteInviteCode = createServerFn({ method: "POST" })
 			.from("office_invite_codes")
 			.delete()
 			.eq("id", data.code_id);
+
+		if (error) {
+			return {
+				success: false,
+				error: error.message,
+			};
+		}
+
+		return { success: true };
+	});
+
+export const updateMemberRole = createServerFn({ method: "POST" })
+	.inputValidator((data: { member_id: string; role: string }) => {
+		if (!data.member_id) {
+			throw new Error("L'ID du membre est requis");
+		}
+		if (!data.role) {
+			throw new Error("Le rôle est requis");
+		}
+		return data;
+	})
+	.handler(async ({ data }): Promise<{ success: boolean; error?: string }> => {
+		const supabase = getSupabaseServerClient();
+
+		const { error } = await supabase
+			.from("office_members")
+			.update({ role: data.role })
+			.eq("id", data.member_id);
 
 		if (error) {
 			return {
