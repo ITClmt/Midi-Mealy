@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getSupabaseServerClient } from "@/lib/db/supabase";
-import type { OfficeInviteCode } from "./members.types";
+import type { OfficeInviteCode } from "./officeCode";
 
 export const generateInviteCode = createServerFn({ method: "POST" })
 	.inputValidator(
@@ -249,97 +249,6 @@ export const validateInviteCode = createServerFn({ method: "POST" })
 		},
 	);
 
-/**
- * Utilise un code d'invitation pour rejoindre un office
- */
-export const useInviteCode = createServerFn({ method: "POST" })
-	.inputValidator((data: { code: string }) => {
-		if (!data.code) {
-			throw new Error("Le code est requis");
-		}
-		return data;
-	})
-	.handler(
-		async ({
-			data,
-		}): Promise<{ success: boolean; office_id?: number; error?: string }> => {
-			const supabase = getSupabaseServerClient();
-
-			// Vérifier l'authentification
-			const { data: userData, error: userError } =
-				await supabase.auth.getUser();
-			if (userError || !userData.user) {
-				return {
-					success: false,
-					error: "Vous devez être connecté pour utiliser un code d'invitation",
-				};
-			}
-
-			// Valider le code
-			const validation = await validateInviteCode({
-				data: { code: data.code },
-			});
-			if (!validation.valid || !validation.office_id) {
-				return {
-					success: false,
-					error: validation.reason || "Code invalide",
-				};
-			}
-
-			const officeId = validation.office_id;
-
-			// Vérifier si l'utilisateur est déjà membre
-			const { data: existingMember } = await supabase
-				.from("office_members")
-				.select("id")
-				.eq("office_id", officeId)
-				.eq("user_id", userData.user.id)
-				.single();
-
-			if (existingMember) {
-				return {
-					success: false,
-					error: "Vous êtes déjà membre de cet office",
-				};
-			}
-
-			// Ajouter l'utilisateur comme membre
-			const { error: memberError } = await supabase
-				.from("office_members")
-				.insert({
-					office_id: officeId,
-					user_id: userData.user.id,
-					role: "member",
-				});
-
-			if (memberError) {
-				return {
-					success: false,
-					error: memberError.message,
-				};
-			}
-
-			// Récupérer le code actuel et incrémenter
-			const { data: codeData } = await supabase
-				.from("office_invite_codes")
-				.select("uses_count")
-				.eq("code", data.code.toUpperCase().trim())
-				.single();
-
-			if (codeData) {
-				await supabase
-					.from("office_invite_codes")
-					.update({ uses_count: codeData.uses_count + 1 })
-					.eq("code", data.code.toUpperCase().trim());
-			}
-
-			return {
-				success: true,
-				office_id: officeId,
-			};
-		},
-	);
-
 export const deleteInviteCode = createServerFn({ method: "POST" })
 	.inputValidator((data: { code_id: string }) => {
 		if (!data.code_id) {
@@ -354,34 +263,6 @@ export const deleteInviteCode = createServerFn({ method: "POST" })
 			.from("office_invite_codes")
 			.delete()
 			.eq("id", data.code_id);
-
-		if (error) {
-			return {
-				success: false,
-				error: error.message,
-			};
-		}
-
-		return { success: true };
-	});
-
-export const updateMemberRole = createServerFn({ method: "POST" })
-	.inputValidator((data: { member_id: string; role: string }) => {
-		if (!data.member_id) {
-			throw new Error("L'ID du membre est requis");
-		}
-		if (!data.role) {
-			throw new Error("Le rôle est requis");
-		}
-		return data;
-	})
-	.handler(async ({ data }): Promise<{ success: boolean; error?: string }> => {
-		const supabase = getSupabaseServerClient();
-
-		const { error } = await supabase
-			.from("office_members")
-			.update({ role: data.role })
-			.eq("id", data.member_id);
 
 		if (error) {
 			return {

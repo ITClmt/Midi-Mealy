@@ -468,3 +468,160 @@ export const fetchOSMRestaurants = createServerFn({ method: "GET" })
 			);
 		}
 	});
+
+export const joinOffice = createServerFn({ method: "POST" })
+	.inputValidator((data: { office_id: number; code?: string }) => {
+		if (!data.office_id) {
+			throw new Error("L'ID de l'office est requis");
+		}
+		return data;
+	})
+	.handler(async ({ data }): Promise<{ success: boolean; error?: string }> => {
+		const supabase = getSupabaseServerClient();
+
+		// 1. Vérifier l'authentification
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+		if (!user) {
+			return {
+				success: false,
+				error: "Vous devez être connecté pour rejoindre un office",
+			};
+		}
+
+		// 2. Récupérer l'office
+		const { data: office, error: officeError } = await supabase
+			.from("offices")
+			.select("id, name, join_policy")
+			.eq("id", data.office_id)
+			.single();
+
+		if (officeError || !office) {
+			return {
+				success: false,
+				error: "Office non trouvé",
+			};
+		}
+
+		// 3. Vérifier si l'utilisateur est déjà membre
+		const { data: existingMember } = await supabase
+			.from("office_members")
+			.select("id")
+			.eq("office_id", data.office_id)
+			.eq("user_id", user.id)
+			.single();
+
+		if (existingMember) {
+			return {
+				success: false,
+				error: "Vous êtes déjà membre de cet office",
+			};
+		}
+
+		// 4. Traiter selon la politique d'adhésion
+		if (!office.join_policy || office.join_policy === "open") {
+			// Office ouvert : adhésion directe
+			const { error: insertError } = await supabase
+				.from("office_members")
+				.insert({
+					office_id: data.office_id,
+					user_id: user.id,
+					role: "member",
+				});
+
+			if (insertError) {
+				console.error("Erreur lors de l'ajout du membre:", insertError);
+				return {
+					success: false,
+					error: "Erreur lors de l'adhésion à l'office",
+				};
+			}
+
+			return { success: true };
+		}
+
+		if (office.join_policy === "code_required") {
+			// Office avec code requis
+			if (!data.code) {
+				return {
+					success: false,
+					error: "Un code d'invitation est requis pour rejoindre cet office",
+				};
+			}
+
+			const normalizedCode = data.code.toUpperCase().trim();
+
+			// Valider le code depuis office_invite_codes
+			const { data: inviteCode, error: codeError } = await supabase
+				.from("office_invite_codes")
+				.select("*")
+				.eq("code", normalizedCode)
+				.eq("office_id", data.office_id)
+				.single();
+
+			if (codeError || !inviteCode) {
+				return {
+					success: false,
+					error: "Code d'invitation invalide",
+				};
+			}
+
+			// Vérifier si le code est actif
+			if (!inviteCode.is_active) {
+				return {
+					success: false,
+					error: "Ce code d'invitation a été désactivé",
+				};
+			}
+
+			// Vérifier la date d'expiration
+			if (new Date(inviteCode.expires_at) < new Date()) {
+				return {
+					success: false,
+					error: "Ce code d'invitation a expiré",
+				};
+			}
+
+			// Vérifier le nombre d'utilisations
+			if (
+				inviteCode.max_uses !== null &&
+				inviteCode.uses_count >= inviteCode.max_uses
+			) {
+				return {
+					success: false,
+					error: "Ce code a atteint le nombre maximum d'utilisations",
+				};
+			}
+
+			// Ajouter l'utilisateur comme membre
+			const { error: insertError } = await supabase
+				.from("office_members")
+				.insert({
+					office_id: data.office_id,
+					user_id: user.id,
+					role: "member",
+				});
+
+			if (insertError) {
+				console.error("Erreur lors de l'ajout du membre:", insertError);
+				return {
+					success: false,
+					error: "Erreur lors de l'adhésion à l'office",
+				};
+			}
+
+			// Incrémenter le compteur d'utilisations du code
+			await supabase
+				.from("office_invite_codes")
+				.update({ uses_count: inviteCode.uses_count + 1 })
+				.eq("id", inviteCode.id);
+
+			return { success: true };
+		}
+
+		return {
+			success: false,
+			error: "Politique d'adhésion non reconnue",
+		};
+	});

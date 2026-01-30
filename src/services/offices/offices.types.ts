@@ -9,6 +9,7 @@ export interface Office {
 	lat: number;
 	lng: number;
 	manager_id?: string;
+	join_policy: "open" | "code_required";
 }
 
 export interface CreateOfficeInput {
