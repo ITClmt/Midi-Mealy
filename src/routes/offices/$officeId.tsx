@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, useMatches } from "@tanstack/react-router";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { JoinOfficeButton } from "@/components/offices/JoinOfficeButton";
 import { OfficeHero } from "@/components/offices/OfficeHero";
 import { OfficeManagement } from "@/components/offices/OfficeManagement";
 import ReviewSection from "@/components/reviews/ReviewSection";
@@ -74,10 +75,13 @@ function OfficeLayoutComponent() {
 					officeName={office.name}
 					restaurantsLength={restaurants.length}
 				/>
-				<div className="px-6 py-4">
-					<OfficeManagement office={office} isManager={isManager} />
-				</div>
+				<OfficeManagement office={office} isManager={isManager} />
 				<ReviewSection office={office} restaurants={restaurants} />
+				{!isManager && (
+					<div className="lg:absolute lg:top-8 lg:right-4 mt-8">
+						<JoinOfficeButton officeData={office} />
+					</div>
+				)}
 			</main>
 		</div>
 	);

@@ -60,7 +60,7 @@ export function OfficeManagement({ office, isManager }: OfficeManagementProps) {
 	}
 
 	return (
-		<div className="mb-8 p-4 bg-muted/50 rounded-lg border">
+		<div className="m-8 p-4 bg-muted/50 rounded-lg border">
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2 text-muted-foreground">
 					<Settings className="w-4 h-4" />
