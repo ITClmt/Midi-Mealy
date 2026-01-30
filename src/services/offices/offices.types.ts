@@ -19,6 +19,7 @@ export interface CreateOfficeInput {
 	zip_code: string;
 	country: string;
 	logo_url?: string;
+	join_policy?: "open" | "code_required";
 }
 
 export interface OfficesCardProps {

@@ -38,21 +38,31 @@ export const generateInviteCode = createServerFn({ method: "POST" })
 				};
 			}
 
+			// Vérifier si l'utilisateur est le manager de l'office (via offices.manager_id)
+			const { data: office } = await supabase
+				.from("offices")
+				.select("manager_id")
+				.eq("id", data.office_id)
+				.single();
+
+			const isOfficeManager = office?.manager_id === userData.user.id;
+
+			// Vérifier si l'utilisateur est manager/moderator dans office_members
 			const { data: officeMember } = await supabase
 				.from("office_members")
-				.select("*")
+				.select("role")
 				.eq("user_id", userData.user.id)
 				.eq("office_id", data.office_id)
 				.single();
 
-			if (
-				officeMember?.role !== "manager" ||
-				officeMember?.role !== "moderator"
-			) {
+			const isMemberWithRole =
+				officeMember?.role === "manager" || officeMember?.role === "moderator";
+
+			if (!isOfficeManager && !isMemberWithRole) {
 				return {
 					success: false,
 					error:
-						"Vous devez être manager ou modérateur de l'office pour générer un code d'invitation",
+						"Vous devez être manager ou modérateur pour générer un code d'invitation",
 				};
 			}
 

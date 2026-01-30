@@ -557,13 +557,20 @@ export const joinOffice = createServerFn({ method: "POST" })
 				.from("office_invite_codes")
 				.select("*")
 				.eq("code", normalizedCode)
-				.eq("office_id", data.office_id)
 				.single();
 
 			if (codeError || !inviteCode) {
 				return {
 					success: false,
 					error: "Code d'invitation invalide",
+				};
+			}
+
+			// Vérifier que le code appartient bien à cet office
+			if (inviteCode.office_id !== data.office_id) {
+				return {
+					success: false,
+					error: "Ce code n'est pas valide pour cet office",
 				};
 			}
 
@@ -611,11 +618,18 @@ export const joinOffice = createServerFn({ method: "POST" })
 				};
 			}
 
-			// Incrémenter le compteur d'utilisations du code
-			await supabase
-				.from("office_invite_codes")
-				.update({ uses_count: inviteCode.uses_count + 1 })
-				.eq("id", inviteCode.id);
+			// Incrémenter le compteur d'utilisations du code via RPC (bypass RLS)
+			const { error: updateError } = await supabase.rpc(
+				"increment_invite_code_uses",
+				{ code_id: inviteCode.id },
+			);
+
+			if (updateError) {
+				console.error(
+					"Erreur lors de l'incrémentation uses_count:",
+					updateError,
+				);
+			}
 
 			return { success: true };
 		}

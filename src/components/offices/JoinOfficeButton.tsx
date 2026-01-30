@@ -83,7 +83,11 @@ export const JoinOfficeButton = ({ officeData }: { officeData: Office }) => {
 
 			<Button onClick={handleJoin}>Rejoindre {officeData.name}</Button>
 
-			{error && <p className="text-sm text-destructive">{error}</p>}
+			{error && (
+				<p className="max-w-[180px] text-center text-sm text-destructive">
+					{error}
+				</p>
+			)}
 		</div>
 	);
 };
