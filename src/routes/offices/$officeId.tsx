@@ -40,7 +40,7 @@ function OfficeLayoutComponent() {
 		return (
 			<div className="flex flex-1">
 				<Sidebar officeId={officeId} userId={authState?.user?.id} />
-				<section className="flex-1 flex items-center justify-center">
+				<section className="flex-1 flex items-center justify-center pt-10">
 					<div className="flex flex-col items-center gap-4">
 						<div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
 						<p className="text-muted-foreground">

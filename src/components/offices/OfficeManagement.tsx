@@ -5,6 +5,7 @@ import type { Office } from "@/services/offices/offices.types";
 import { DeleteOfficeDialog } from "./DeleteOfficeDialog";
 import { EditOfficeForm } from "./EditOfficeForm";
 import { GenerateCodeForm } from "./GenerateCodeForm";
+import { InviteCodesList } from "./InviteCodesList";
 import { JoinPolicyToggle } from "./JoinPolicyToggle";
 
 interface OfficeManagementProps {
@@ -17,6 +18,7 @@ type ManagementView = "none" | "edit" | "delete";
 export function OfficeManagement({ office, isManager }: OfficeManagementProps) {
 	const [currentView, setCurrentView] = useState<ManagementView>("none");
 	const [currentPolicy, setCurrentPolicy] = useState(office.join_policy);
+	const [codesRefreshKey, setCodesRefreshKey] = useState(0);
 
 	if (!isManager) {
 		return null;
@@ -106,9 +108,18 @@ export function OfficeManagement({ office, isManager }: OfficeManagementProps) {
 				</div>
 			</div>
 
-			{/* Formulaire de génération de code (visible seulement si code_required) */}
+			{/* Section codes d'invitation (visible seulement si code_required) */}
 			{currentPolicy === "code_required" && (
-				<GenerateCodeForm officeId={Number(office.id)} />
+				<>
+					<GenerateCodeForm
+						officeId={Number(office.id)}
+						onCodeGenerated={() => setCodesRefreshKey((k) => k + 1)}
+					/>
+					<InviteCodesList
+						officeId={Number(office.id)}
+						refreshKey={codesRefreshKey}
+					/>
+				</>
 			)}
 		</div>
 	);

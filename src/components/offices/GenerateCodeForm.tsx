@@ -7,9 +7,13 @@ import { Label } from "../ui/label";
 
 interface GenerateCodeFormProps {
 	officeId: number;
+	onCodeGenerated?: () => void;
 }
 
-export function GenerateCodeForm({ officeId }: GenerateCodeFormProps) {
+export function GenerateCodeForm({
+	officeId,
+	onCodeGenerated,
+}: GenerateCodeFormProps) {
 	const expiresId = useId();
 	const maxUsesId = useId();
 	const [expiresInDays, setExpiresInDays] = useState(7);
@@ -39,6 +43,7 @@ export function GenerateCodeForm({ officeId }: GenerateCodeFormProps) {
 
 		if (result.success && result.code) {
 			setGeneratedCode(result.code.code);
+			onCodeGenerated?.();
 		} else {
 			setError(result.error || "Erreur lors de la génération");
 		}

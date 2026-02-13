@@ -169,10 +169,36 @@ export const revokeInviteCode = createServerFn({ method: "POST" })
 	.handler(async ({ data }): Promise<{ success: boolean; error?: string }> => {
 		const supabase = getSupabaseServerClient();
 
-		const { error } = await supabase
-			.from("office_invite_codes")
-			.update({ is_active: false })
-			.eq("id", data.code_id);
+		const { error } = await supabase.rpc("revoke_invite_code", {
+			code_id: data.code_id,
+		});
+
+		if (error) {
+			return {
+				success: false,
+				error: error.message,
+			};
+		}
+
+		return { success: true };
+	});
+
+/**
+ * Réactive un code d'invitation désactivé
+ */
+export const reactivateInviteCode = createServerFn({ method: "POST" })
+	.inputValidator((data: { code_id: string }) => {
+		if (!data.code_id) {
+			throw new Error("L'ID du code est requis");
+		}
+		return data;
+	})
+	.handler(async ({ data }): Promise<{ success: boolean; error?: string }> => {
+		const supabase = getSupabaseServerClient();
+
+		const { error } = await supabase.rpc("reactivate_invite_code", {
+			code_id: data.code_id,
+		});
 
 		if (error) {
 			return {
@@ -269,10 +295,9 @@ export const deleteInviteCode = createServerFn({ method: "POST" })
 	.handler(async ({ data }): Promise<{ success: boolean; error?: string }> => {
 		const supabase = getSupabaseServerClient();
 
-		const { error } = await supabase
-			.from("office_invite_codes")
-			.delete()
-			.eq("id", data.code_id);
+		const { error } = await supabase.rpc("delete_invite_code", {
+			code_id: data.code_id,
+		});
 
 		if (error) {
 			return {
