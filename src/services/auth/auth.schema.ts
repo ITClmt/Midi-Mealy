@@ -33,6 +33,7 @@ export const LoginSchema = z.object({
 
 export const UserMetaSchema = z.object({
 	username: z.string().min(3).max(20),
+	display_office_id: z.number().optional(),
 });
 
 export type UserMeta = z.infer<typeof UserMetaSchema>;

@@ -73,7 +73,10 @@ export const getUser = createServerFn().handler(async () => {
 		isAuthenticated: true,
 		user: {
 			email: data.user.email,
-			meta: { username: data.user.user_metadata.name },
+			meta: {
+				username: data.user.user_metadata.name,
+				display_office_id: data.user.user_metadata.display_office_id,
+			},
 			id: data.user.id,
 		},
 	};
@@ -96,4 +99,23 @@ export const updateUsername = createServerFn({ method: "POST" })
 		}
 
 		return { success: true, username: data.username };
+	});
+
+/**
+ * Met à jour l'office affiché dans le profil
+ */
+export const updateDisplayOffice = createServerFn({ method: "POST" })
+	.inputValidator((data: { display_office_id: number | null }) => data)
+	.handler(async ({ data }) => {
+		const supabase = getSupabaseServerClient();
+
+		const { error } = await supabase.auth.updateUser({
+			data: { display_office_id: data.display_office_id },
+		});
+
+		if (error) {
+			throw new Error(`Erreur lors de la mise à jour: ${error.message}`);
+		}
+
+		return { success: true };
 	});

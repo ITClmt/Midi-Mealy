@@ -76,7 +76,7 @@ export const updateReview = createServerFn({ method: "POST" })
 				comment: data.comment,
 			})
 			.eq("id", data.reviewId)
-			.eq("user_id", user.id) // Ensure user can only update their own review
+			.eq("user_id", user.id)
 			.select()
 			.single();
 
@@ -154,7 +154,33 @@ export const fetchReviewsByRestaurantId = createServerFn({ method: "GET" })
 			throw new Error("Erreur lors de la récupération des avis");
 		}
 
-		return data as Review[];
+		const reviews = data as Review[];
+
+		// Résoudre les noms d'office pour chaque auteur
+		const userIds = [
+			...new Set(reviews.map((r) => r.user_id).filter(Boolean)),
+		] as string[];
+		if (userIds.length > 0) {
+			const { data: officeData } = await supabase.rpc(
+				"get_user_display_offices",
+				{ user_ids: userIds },
+			);
+
+			if (officeData) {
+				const officeMap = new Map(
+					(officeData as { user_id: string; office_name: string }[]).map(
+						(o) => [o.user_id, o.office_name],
+					),
+				);
+				for (const review of reviews) {
+					if (review.user_id && officeMap.has(review.user_id)) {
+						review.office_name = officeMap.get(review.user_id);
+					}
+				}
+			}
+		}
+
+		return reviews;
 	});
 
 export const fetchTopRestaurants = createServerFn({ method: "POST" })

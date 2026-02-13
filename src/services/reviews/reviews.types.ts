@@ -7,6 +7,7 @@ export interface Review {
 	comment?: string;
 	user_id?: string;
 	username?: string;
+	office_name?: string;
 }
 
 export interface CreateReviewDTO {

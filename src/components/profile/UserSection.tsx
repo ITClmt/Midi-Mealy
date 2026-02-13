@@ -1,10 +1,11 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
-import { Check, Loader2, User2Icon } from "lucide-react";
+import { Building2, Check, Loader2, User2Icon } from "lucide-react";
 import { useId, useState } from "react";
 import { useAppForm } from "@/hooks/form";
-import { updateUsername } from "@/services/auth/auth.api";
+import { updateDisplayOffice, updateUsername } from "@/services/auth/auth.api";
 import type { User } from "@/services/auth/auth.schema";
+import { getUserOffices } from "@/services/officeMember/officeMember.api";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
@@ -15,6 +16,28 @@ export const UserSection = ({ user }: { user: User }) => {
 	const [successMessage, setSuccessMessage] = useState<string | null>(null);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const emailInputId = useId();
+	const officeSelectId = useId();
+
+	const { data: officesData } = useQuery({
+		queryKey: ["user-offices"],
+		queryFn: () => getUserOffices({ data: undefined }),
+	});
+
+	const displayOfficeMutation = useMutation({
+		mutationFn: (officeId: number | null) =>
+			updateDisplayOffice({ data: { display_office_id: officeId } }),
+		onSuccess: () => {
+			setSuccessMessage("Entreprise d'affichage mis à jour !");
+			setErrorMessage(null);
+			queryClient.invalidateQueries();
+			router.invalidate();
+			setTimeout(() => setSuccessMessage(null), 3000);
+		},
+		onError: (error: Error) => {
+			setErrorMessage(error.message);
+			setSuccessMessage(null);
+		},
+	});
 
 	const updateMutation = useMutation({
 		mutationFn: (username: string) => updateUsername({ data: { username } }),
@@ -112,6 +135,40 @@ export const UserSection = ({ user }: { user: User }) => {
 						L'email ne peut pas être modifié pour le moment.
 					</p>
 				</div>
+
+				{/* Office d'affichage */}
+				{officesData?.offices && officesData.offices.length > 0 && (
+					<div className="pt-4 border-t">
+						<div className="flex items-center gap-2 mb-2">
+							<Building2 className="w-4 h-4" />
+							<Label htmlFor={officeSelectId} className="text-xl font-medium">
+								Entreprise affichée
+							</Label>
+						</div>
+						<select
+							id={officeSelectId}
+							className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+							value={user.meta.display_office_id ?? ""}
+							onChange={(e) => {
+								const value = e.target.value;
+								displayOfficeMutation.mutate(
+									value === "" ? null : Number(value),
+								);
+							}}
+							disabled={displayOfficeMutation.isPending}
+						>
+							<option value="">Aucune</option>
+							{officesData.offices.map((office) => (
+								<option key={office.id} value={office.id}>
+									{office.name}
+								</option>
+							))}
+						</select>
+						<p className="text-xs text-muted-foreground mt-1">
+							Cette entreprise sera affichée à côté de votre nom dans vos avis.
+						</p>
+					</div>
+				)}
 			</div>
 		</section>
 	);

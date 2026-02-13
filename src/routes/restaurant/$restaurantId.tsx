@@ -196,6 +196,11 @@ function RouteComponent() {
 											<span className="font-medium text-foreground">
 												{review.username || "Utilisateur"}
 											</span>
+											{review.office_name && (
+												<span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+													{review.office_name}
+												</span>
+											)}
 											<span className="text-muted-foreground">•</span>
 											<div className="flex gap-0.5">
 												{[1, 2, 3, 4, 5].map((star) => (

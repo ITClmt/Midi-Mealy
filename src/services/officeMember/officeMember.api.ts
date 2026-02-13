@@ -107,3 +107,55 @@ export const leaveOffice = createServerFn({ method: "POST" })
 
 		return { success: true };
 	});
+
+/**
+ * Récupère les offices dont l'utilisateur courant est membre
+ */
+export const getUserOffices = createServerFn({ method: "GET" })
+	.inputValidator((data: unknown) => data)
+	.handler(async () => {
+		const supabase = getSupabaseServerClient();
+
+		const { data: userData, error: userError } = await supabase.auth.getUser();
+		if (userError || !userData.user) {
+			return { offices: [] };
+		}
+
+		// Offices where user is a member
+		const { data: memberships } = await supabase
+			.from("office_members")
+			.select("office_id")
+			.eq("user_id", userData.user.id);
+
+		// Offices where user is the manager (creator)
+		const { data: managedOffices } = await supabase
+			.from("offices")
+			.select("id, name")
+			.eq("manager_id", userData.user.id);
+
+		const managedIds = new Set(
+			(managedOffices || []).map((o: { id: number }) => o.id),
+		);
+		const memberOfficeIds = (memberships || [])
+			.map((m: { office_id: number }) => m.office_id)
+			.filter((id: number) => !managedIds.has(id));
+
+		let memberOffices: { id: number; name: string }[] = [];
+		if (memberOfficeIds.length > 0) {
+			const { data: offices } = await supabase
+				.from("offices")
+				.select("id, name")
+				.in("id", memberOfficeIds);
+			memberOffices = (offices || []) as { id: number; name: string }[];
+		}
+
+		const allOffices = [
+			...(managedOffices || []).map((o: { id: number; name: string }) => ({
+				id: o.id,
+				name: o.name,
+			})),
+			...memberOffices,
+		];
+
+		return { offices: allOffices };
+	});
