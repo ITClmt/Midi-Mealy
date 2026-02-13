@@ -1,14 +1,24 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { MapPin, MessageSquare, Star } from "lucide-react";
+import {
+	ChevronLeft,
+	ChevronRight,
+	MapPin,
+	MessageSquare,
+	Star,
+} from "lucide-react";
+import { useState } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
+import { Button } from "@/components/ui/button";
 import { fetchOSMRestaurantById } from "@/services/offices/offices.api";
 import type { Restaurant } from "@/services/restaurants/restaurants.types";
 import {
 	fetchRestaurantRatings,
 	fetchReviewsByRestaurantId,
 } from "@/services/reviews/reviews.api";
+
+const REVIEWS_PER_PAGE = 10;
 
 export const Route = createFileRoute("/restaurant/$restaurantId")({
 	component: RouteComponent,
@@ -17,6 +27,7 @@ export const Route = createFileRoute("/restaurant/$restaurantId")({
 function RouteComponent() {
 	const { restaurantId } = Route.useParams();
 	const { authState } = Route.useRouteContext();
+	const [currentPage, setCurrentPage] = useState(1);
 
 	// Get last office ID from session storage for sidebar
 	const lastOfficeId =
@@ -99,6 +110,13 @@ function RouteComponent() {
 		cuisine: osmRestaurant.cuisine || undefined,
 	};
 
+	const totalReviews = reviews?.length || 0;
+	const totalPages = Math.ceil(totalReviews / REVIEWS_PER_PAGE);
+	const paginatedReviews = reviews?.slice(
+		(currentPage - 1) * REVIEWS_PER_PAGE,
+		currentPage * REVIEWS_PER_PAGE,
+	);
+
 	return (
 		<div className="flex flex-1">
 			{lastOfficeId && (
@@ -163,13 +181,13 @@ function RouteComponent() {
 						<div className="flex items-center gap-2 mb-4">
 							<MessageSquare className="w-5 h-5 text-muted-foreground" />
 							<h2 className="text-lg font-semibold text-foreground">
-								Avis ({reviews?.length || 0})
+								Avis ({totalReviews})
 							</h2>
 						</div>
 
-						{reviews && reviews.length > 0 ? (
+						{paginatedReviews && paginatedReviews.length > 0 ? (
 							<div className="space-y-4">
-								{reviews.map((review) => (
+								{paginatedReviews.map((review) => (
 									<div
 										key={review.id}
 										className="bg-card border border-border rounded-xl p-4"
@@ -208,6 +226,33 @@ function RouteComponent() {
 										)}
 									</div>
 								))}
+
+								{/* Pagination */}
+								{totalPages > 1 && (
+									<div className="flex items-center justify-center gap-2 pt-4">
+										<Button
+											variant="outline"
+											size="icon"
+											className="h-8 w-8"
+											onClick={() => setCurrentPage((p) => p - 1)}
+											disabled={currentPage === 1}
+										>
+											<ChevronLeft className="w-4 h-4" />
+										</Button>
+										<span className="text-sm text-muted-foreground px-2">
+											{currentPage} / {totalPages}
+										</span>
+										<Button
+											variant="outline"
+											size="icon"
+											className="h-8 w-8"
+											onClick={() => setCurrentPage((p) => p + 1)}
+											disabled={currentPage === totalPages}
+										>
+											<ChevronRight className="w-4 h-4" />
+										</Button>
+									</div>
+								)}
 							</div>
 						) : (
 							<div className="bg-card border border-border rounded-xl p-8 text-center">
