@@ -49,6 +49,23 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 			</Link>
 		</div>
 	),
+	errorComponent: ({ error }) => (
+		<div className="flex flex-col items-center justify-center min-h-screen p-4">
+			<h1 className="text-4xl font-bold mb-4 text-destructive">Erreur</h1>
+			<p className="text-xl text-muted-foreground mb-4">
+				Une erreur inattendue est survenue
+			</p>
+			<p className="text-sm text-muted-foreground mb-8 max-w-md text-center">
+				{error instanceof Error ? error.message : "Erreur inconnue"}
+			</p>
+			<Link
+				to="/"
+				className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+			>
+				Retour à l'accueil
+			</Link>
+		</div>
+	),
 	head: () => ({
 		meta: [
 			// Encodage et titre

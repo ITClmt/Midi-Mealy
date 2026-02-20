@@ -11,7 +11,8 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { useAppForm } from "@/hooks/form";
-import { geocodeAddress, updateOffice } from "@/services/offices/offices.api";
+import { geocodeAddress } from "@/services/geocoding/geocoding.api";
+import { updateOffice } from "@/services/offices/offices.api";
 import type {
 	CreateOfficeInput,
 	Office,

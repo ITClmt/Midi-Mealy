@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Building2, Plus, Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
-import OfficesCard from "@/components/OfficesCard";
+import { OfficesCard } from "@/components/OfficesCard";
 import { CreateOfficeForm } from "@/components/offices/CreateOfficeForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

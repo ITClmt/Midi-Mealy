@@ -50,16 +50,3 @@ export interface OSMElement {
 export interface OSMResponse {
 	elements: OSMElement[];
 }
-
-export interface Restaurant {
-	id: string;
-	name: string;
-	lat: number;
-	lng: number;
-	cuisine: string | null;
-	address: string | null;
-	phone: string | null;
-	website: string | null;
-	opening_hours: string | null;
-	source: string;
-}

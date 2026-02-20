@@ -11,7 +11,7 @@ import { useState } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { Button } from "@/components/ui/button";
-import { fetchOSMRestaurantById } from "@/services/offices/offices.api";
+import { fetchOSMRestaurantById } from "@/services/restaurants/restaurants.api";
 import type { Restaurant } from "@/services/restaurants/restaurants.types";
 import {
 	fetchRestaurantRatings,

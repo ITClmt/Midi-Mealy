@@ -25,11 +25,11 @@ function RouteComponent() {
 		throw new Error("User must be authenticated to view this page");
 	}
 
-	// Récupérer le dernier officeId visité depuis sessionStorage ou utiliser "1" par défaut
+	// Récupérer le dernier officeId visité depuis sessionStorage
 	const lastOfficeId =
 		typeof window !== "undefined"
-			? sessionStorage.getItem("lastOfficeId") || "1"
-			: "1";
+			? sessionStorage.getItem("lastOfficeId") || ""
+			: "";
 
 	return (
 		<div className="flex flex-1">

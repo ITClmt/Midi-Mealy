@@ -11,6 +11,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { useAppForm } from "@/hooks/form";
+import { parseErrorMessage } from "@/lib/errors";
 import { login } from "@/services/auth/auth.api";
 import type { LoginSchema } from "@/services/auth/auth.schema";
 
@@ -23,19 +24,6 @@ export function LoginForm({ onToggleMode, showToggle = true }: LoginFormProps) {
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 	const [formError, setFormError] = useState<string | null>(null);
-
-	const parseErrorMessage = (message: string | undefined): string => {
-		if (!message) return "Une erreur est survenue";
-
-		try {
-			const parsed = JSON.parse(message);
-			if (Array.isArray(parsed) && parsed.length > 0) {
-				return parsed[0]?.message || message;
-			}
-		} catch {}
-
-		return message;
-	};
 
 	const loginMutation = useMutation({
 		mutationFn: (data: Parameters<typeof login>[0]) => login(data),

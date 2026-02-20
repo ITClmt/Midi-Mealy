@@ -152,20 +152,6 @@ export const RestaurantMap = ({
 			}
 		});
 
-		// Exposer le gestionnaire de clic globalement pour les popups
-		if (onRestaurantClick) {
-			(
-				window as unknown as {
-					restaurantClickHandler?: (restaurantId: string) => void;
-				}
-			).restaurantClickHandler = (restaurantId: string) => {
-				const restaurant = restaurants.find((r) => r.id === restaurantId);
-				if (restaurant) {
-					onRestaurantClick(restaurant);
-				}
-			};
-		}
-
 		mapRef.current = map;
 
 		// Cleanup
@@ -175,20 +161,6 @@ export const RestaurantMap = ({
 				mapRef.current = null;
 			}
 			markersRef.current.clear();
-			// Nettoyer le gestionnaire global
-			if (
-				(
-					window as unknown as {
-						restaurantClickHandler?: (restaurantId: string) => void;
-					}
-				).restaurantClickHandler
-			) {
-				delete (
-					window as unknown as {
-						restaurantClickHandler?: (restaurantId: string) => void;
-					}
-				).restaurantClickHandler;
-			}
 		};
 	}, [center, zoom, restaurants, onRestaurantClick, officeLogoUrl]);
 

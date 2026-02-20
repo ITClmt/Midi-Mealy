@@ -1,6 +1,9 @@
-import { redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getSupabaseServerClient } from "@/lib/db/supabase";
+import {
+	UpdateDisplayOfficeSchema,
+	UpdateUsernameSchema,
+} from "@/services/schemas";
 import { LoginSchema, SignUpSchema } from "./auth.schema";
 
 export const signUp = createServerFn()
@@ -30,10 +33,8 @@ export const signUp = createServerFn()
 				session: userData.session,
 			};
 		}
-		// Redirect to the prev page stored in the "redirect" search param
-		throw redirect({
-			href: "/",
-		});
+
+		return { error: true, message: "Erreur lors de la création du compte" };
 	});
 
 export const login = createServerFn()
@@ -86,7 +87,7 @@ export const getUser = createServerFn().handler(async () => {
  * Met à jour le nom d'utilisateur
  */
 export const updateUsername = createServerFn({ method: "POST" })
-	.inputValidator((data: { username: string }) => data)
+	.inputValidator(UpdateUsernameSchema)
 	.handler(async ({ data }) => {
 		const supabase = getSupabaseServerClient();
 
@@ -105,7 +106,7 @@ export const updateUsername = createServerFn({ method: "POST" })
  * Met à jour l'office affiché dans le profil
  */
 export const updateDisplayOffice = createServerFn({ method: "POST" })
-	.inputValidator((data: { display_office_id: number | null }) => data)
+	.inputValidator(UpdateDisplayOfficeSchema)
 	.handler(async ({ data }) => {
 		const supabase = getSupabaseServerClient();
 

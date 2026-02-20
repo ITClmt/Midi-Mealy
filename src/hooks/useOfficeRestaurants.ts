@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { fetchOSMRestaurants } from "@/services/offices/offices.api";
+import type { Office } from "@/services/offices/offices.types";
+import { fetchOSMRestaurants } from "@/services/restaurants/restaurants.api";
 import type {
-	Office,
-	Restaurant as OSMRestaurant,
-} from "@/services/offices/offices.types";
-import type { Restaurant } from "@/services/restaurants/restaurants.types";
+	OSMRestaurant,
+	Restaurant,
+} from "@/services/restaurants/restaurants.types";
 import { fetchRestaurantRatings } from "@/services/reviews/reviews.api";
 
 interface UseOfficeRestaurantsResult {
@@ -37,6 +37,7 @@ export function useOfficeRestaurants(
 			fetchOSMRestaurants({
 				data: { lat: office.lat, lng: office.lng },
 			}),
+		staleTime: 5 * 60 * 1000, // 5 min — OSM data changes rarely
 	});
 
 	const { data: ratings } = useQuery({
@@ -46,8 +47,10 @@ export function useOfficeRestaurants(
 				data: (osmRestaurants || []).map((r) => r.id),
 			}),
 		enabled: !!osmRestaurants && osmRestaurants.length > 0,
+		staleTime: 2 * 60 * 1000, // 2 min — ratings can change more often
 	});
 
+	// Map OSMRestaurant → Restaurant (normalize lat/lng → latitude/longitude)
 	const restaurants: Restaurant[] = (osmRestaurants || []).map(
 		(restaurant: OSMRestaurant) => ({
 			id: restaurant.id,
