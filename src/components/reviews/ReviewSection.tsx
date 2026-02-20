@@ -22,7 +22,7 @@ export default function ReviewSection({
 
 	if (isPending) {
 		return (
-			<div className="mt-12 animate-pulse">
+			<div className="m-12 animate-pulse">
 				<div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 					{[1, 2, 3].map((i) => (
@@ -34,11 +34,17 @@ export default function ReviewSection({
 	}
 
 	if (!topRestaurants || topRestaurants.length === 0) {
-		return null;
+		return (
+			<section className="m-12 container mx-auto px-4">
+				<h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+					Pas de coups de cœur pour le moment...
+				</h2>
+			</section>
+		);
 	}
 
 	return (
-		<section className="mt-12 container mx-auto px-4">
+		<section className="m-12 container mx-auto px-4">
 			<h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
 				Les coups de cœur à {office.name} ❤️
 			</h2>

@@ -21,7 +21,7 @@ function OfficeLayoutComponent() {
 	const { authState } = Route.useRouteContext();
 	const matches = useMatches();
 
-	const { restaurants, isPending, isError, error } = useOfficeRestaurants(
+	const { restaurants, isError, isPending, error } = useOfficeRestaurants(
 		office,
 		officeId,
 	);
@@ -36,47 +36,57 @@ function OfficeLayoutComponent() {
 			match.routeId.includes("/search") || match.routeId.includes("/map"),
 	);
 
-	if (isPending) {
-		return (
-			<div className="flex flex-1">
-				<Sidebar officeId={officeId} userId={authState?.user?.id} />
-				<section className="flex-1 flex items-center justify-center pt-10">
-					<div className="flex flex-col items-center gap-4">
-						<div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-						<p className="text-muted-foreground">
-							Chargement des restaurants...
-						</p>
-					</div>
-				</section>
-			</div>
-		);
-	}
-
-	if (isError) {
-		return (
-			<div className="flex flex-1">
-				<Sidebar officeId={officeId} userId={authState?.user?.id} />
-				<div className="flex-1 p-6">Error: {error?.message}</div>
-			</div>
-		);
-	}
-
-	// Si on est sur une route enfant, on affiche le Outlet
+	// Si on est sur une route enfant (search, map), on affiche le Outlet
 	if (isChildRoute) {
 		return <Outlet />;
 	}
 
-	// Sinon on affiche le contenu par défaut (page principale de l'office)
+	// Layout unique — seul le contenu central change selon l'état
 	return (
 		<div className="flex flex-1">
 			<Sidebar officeId={officeId} userId={authState?.user?.id} />
 			<main className="flex-1 bg-background pb-16 md:pb-0 overflow-auto">
 				<OfficeHero
 					officeName={office.name}
-					restaurantsLength={restaurants.length}
+					restaurantsLength={restaurants?.length ?? 0}
 				/>
 				<OfficeManagement office={office} isManager={isManager} />
-				<ReviewSection office={office} restaurants={restaurants} />
+
+				{/* Contenu conditionnel */}
+				{isError && (
+					<div className="p-6 text-center">
+						<p className="text-destructive font-medium">
+							Erreur lors du chargement des restaurants
+						</p>
+						<p className="text-sm text-muted-foreground mt-1">
+							{error?.message}
+						</p>
+					</div>
+				)}
+
+				{isPending && (
+					<div className="p-6 animate-pulse">
+						<div className="h-8 bg-muted rounded w-1/3 mb-6" />
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+							{[1, 2, 3].map((i) => (
+								<div key={i} className="h-32 bg-muted rounded-xl" />
+							))}
+						</div>
+					</div>
+				)}
+
+				{!isPending && !isError && restaurants?.length === 0 && (
+					<div className="p-6 text-center">
+						<p className="text-lg text-muted-foreground">
+							Aucun restaurant trouvé à proximité
+						</p>
+					</div>
+				)}
+
+				{!isPending && !isError && restaurants && restaurants.length > 0 && (
+					<ReviewSection office={office} restaurants={restaurants} />
+				)}
+
 				{!isManager && (
 					<div className="lg:absolute lg:top-8 lg:right-4 mt-8">
 						<JoinOfficeButton officeData={office} />
