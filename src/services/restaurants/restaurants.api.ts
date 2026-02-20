@@ -73,9 +73,7 @@ export const fetchOSMRestaurants = createServerFn({ method: "GET" })
 	)
 	.handler(async ({ data }) => {
 		try {
-			// TODO: Replace with pg_cron or Supabase Edge Function cron
-			// for cache cleanup instead of cleaning on every request.
-			// See: https://supabase.com/docs/guides/functions/schedule-functions
+			// pg_cron DELETE FROM osm_restaurants_cache WHERE expires_at < NOW()
 
 			const { lat, lng, radius = 800 } = data;
 
