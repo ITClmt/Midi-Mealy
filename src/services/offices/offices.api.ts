@@ -169,7 +169,7 @@ export const joinOffice = createServerFn({ method: "POST" })
 		if (!user) {
 			return {
 				success: false,
-				error: "Vous devez être connecté pour rejoindre un office",
+				error: "Vous devez être connecté",
 			};
 		}
 
