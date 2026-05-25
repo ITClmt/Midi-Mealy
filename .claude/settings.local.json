@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\itcle\\\\Desktop\\\\Projet_Perso\\\\Midi-Mealy\\\\Midi-Mealy\" -Recurse -Force)",
+      "Bash(Select-Object -Property FullName)",
+      "Bash(Sort-Object FullName)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\itcle\\\\Desktop\\\\Projet_Perso\\\\Midi-Mealy\\\\Midi-Mealy\\\\src\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(npm run *)",
+      "Bash(npx biome *)"
+    ]
+  }
+}
