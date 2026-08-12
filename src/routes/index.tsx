@@ -39,15 +39,18 @@ const features = [
 const steps = [
 	{
 		title: "Rejoins ton bureau",
-		description: "Crée ou rejoins le bureau de ton équipe avec un code d'invitation.",
+		description:
+			"Crée ou rejoins le bureau de ton équipe avec un code d'invitation.",
 	},
 	{
 		title: "Explore les restos",
-		description: "Parcours la carte ou lance une recherche autour de ton lieu de travail.",
+		description:
+			"Parcours la carte ou lance une recherche autour de ton lieu de travail.",
 	},
 	{
 		title: "Note et compare",
-		description: "Consulte les avis de tes collègues et laisse le tien après le déjeuner.",
+		description:
+			"Consulte les avis de tes collègues et laisse le tien après le déjeuner.",
 	},
 ];
 
@@ -59,7 +62,7 @@ function RouteComponent() {
 	}
 
 	return (
-		<main className="min-h-screen bg-background">
+		<div className="min-h-screen bg-background">
 			{/* Hero */}
 			<section className="container mx-auto px-4 pt-20 pb-16">
 				<div className="max-w-3xl mx-auto text-center space-y-8">
@@ -86,7 +89,7 @@ function RouteComponent() {
 						<Button
 							asChild
 							size="lg"
-							className="border-0 bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-lg shadow-orange-500/25 hover:from-amber-500 hover:to-orange-600"
+							className="border-0 bg-gradient-to-r from-amber-400 to-orange-500 text-foreground shadow-lg shadow-orange-500/25 hover:from-amber-500 hover:to-orange-600"
 						>
 							<Link to="/login">
 								<UserPlus className="w-4 h-4" />
@@ -104,17 +107,14 @@ function RouteComponent() {
 			<section className="container mx-auto px-4 py-16">
 				<div className="max-w-3xl mx-auto divide-y divide-border border-t border-border">
 					{features.map((feature) => (
-						<div
-							key={feature.title}
-							className="flex items-start gap-5 py-8 first:pt-0"
-						>
+						<div key={feature.title} className="flex items-start gap-5 py-8">
 							<div className="w-11 h-11 shrink-0 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
 								<feature.icon className="w-5 h-5" />
 							</div>
 							<div className="space-y-1.5">
-								<h3 className="text-lg font-semibold text-foreground">
+								<h2 className="text-lg font-semibold text-foreground">
 									{feature.title}
-								</h3>
+								</h2>
 								<p className="text-muted-foreground">{feature.description}</p>
 							</div>
 						</div>
@@ -163,7 +163,7 @@ function RouteComponent() {
 						<Button
 							asChild
 							size="lg"
-							className="mt-2 border-0 bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-lg shadow-orange-500/25 hover:from-amber-500 hover:to-orange-600"
+							className="mt-2 border-0 bg-gradient-to-r from-amber-400 to-orange-500 text-foreground shadow-lg shadow-orange-500/25 hover:from-amber-500 hover:to-orange-600"
 						>
 							<Link to="/login">
 								<UserPlus className="w-4 h-4" />
@@ -173,6 +173,6 @@ function RouteComponent() {
 					</CardContent>
 				</Card>
 			</section>
-		</main>
+		</div>
 	);
 }

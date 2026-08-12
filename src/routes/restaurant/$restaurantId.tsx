@@ -122,7 +122,7 @@ function RouteComponent() {
 			{lastOfficeId && (
 				<Sidebar officeId={lastOfficeId} userId={authState?.user?.id} />
 			)}
-			<main className="flex-1 bg-background pb-16 md:pb-0 overflow-auto">
+			<div className="flex-1 bg-background pb-16 md:pb-0 overflow-auto">
 				<div className="max-w-3xl mx-auto px-4 py-8">
 					{/* Restaurant Header */}
 					<header className="mb-8">
@@ -269,7 +269,7 @@ function RouteComponent() {
 						)}
 					</section>
 				</div>
-			</main>
+			</div>
 		</div>
 	);
 }

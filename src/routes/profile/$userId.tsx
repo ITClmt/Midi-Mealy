@@ -34,9 +34,9 @@ function RouteComponent() {
 	return (
 		<div className="flex flex-1">
 			<Sidebar officeId={lastOfficeId} userId={userId} />
-			<main className="flex-1 bg-background pb-16 md:pb-0 overflow-auto p-6">
+			<div className="flex-1 bg-background pb-16 md:pb-0 overflow-auto p-6">
 				<UserSection user={authState.user} />
-			</main>
+			</div>
 		</div>
 	);
 }

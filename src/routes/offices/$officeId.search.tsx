@@ -37,9 +37,9 @@ function SearchComponent() {
 	return (
 		<div className="flex flex-1">
 			<Sidebar officeId={officeId} userId={authState?.user?.id} />
-			<main className="flex-1 bg-background pb-16 md:pb-0 overflow-auto">
+			<div className="flex-1 bg-background pb-16 md:pb-0 overflow-auto">
 				<RestaurantList restaurants={restaurants} />
-			</main>
+			</div>
 		</div>
 	);
 }

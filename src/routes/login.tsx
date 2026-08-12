@@ -22,7 +22,7 @@ function RouteComponent() {
 	};
 
 	return (
-		<main className="min-h-screen bg-background flex flex-col justify-center">
+		<div className="min-h-screen bg-background flex flex-col justify-center">
 			<section className="container mx-auto px-4 py-16">
 				<div className="max-w-3xl mx-auto text-center space-y-8">
 					{/* Logo & Badge */}
@@ -41,6 +41,6 @@ function RouteComponent() {
 					)}
 				</div>
 			</section>
-		</main>
+		</div>
 	);
 }
