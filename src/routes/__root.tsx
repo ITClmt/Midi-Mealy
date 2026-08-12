@@ -9,6 +9,7 @@ import { Bounce, ToastContainer } from "react-toastify";
 import { TopNavbar } from "@/components/layout/TopNavbar";
 import { getUser } from "@/services/auth/auth.api";
 import appCss from "../styles.css?url";
+import ImpeccableLiveRoot from '../impeccable/ImpeccableLiveRoot';
 
 interface MyRouterContext {
 	queryClient: QueryClient;
@@ -196,7 +197,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					/>
 					<main className="flex-1 overflow-auto">{children}</main>
 				</div>
-				<Scripts />
+				{/* impeccable-live-tanstack-start */}
+        <ImpeccableLiveRoot />
+        {/* impeccable-live-tanstack-end */}
+        <Scripts />
 				<ToastContainer
 					position="top-right"
 					autoClose={4000}

@@ -21,6 +21,7 @@ todos.json
 # workspace (apps/web/.impeccable/...); anchored patterns would miss it.
 # Shared artifacts stay tracked: config.json, live/config.json,
 # design.json, critique/*.md.
+/.impeccable
 .impeccable/config.local.json
 .impeccable/hook.cache.json
 .impeccable/hook.pending.json
@@ -37,3 +38,5 @@ todos.json
 .impeccable/live/deferred-svelte-component-accepts.json
 .impeccable/live/*.png
 # impeccable-ignore-end
+.claude/settings.local.json
+.claude/settings.local.json
